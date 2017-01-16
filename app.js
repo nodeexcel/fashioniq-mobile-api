@@ -69,7 +69,7 @@ app.use(user_helper());
 app.use(list_helper());
 app.use(html_helper());
 app.use(module_webp());
-app.use('/v2_routes_catalog', catalog);
+app.use('/v2/routes_catalog', catalog);
 app.use(function (req, res, next) {
     var path = req.path;
 
