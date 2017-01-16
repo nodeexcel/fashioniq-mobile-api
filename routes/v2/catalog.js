@@ -28,7 +28,7 @@ router.all('/list', function (req, res) {
             res.json({status: 0, message: err});
         }
         if (!data) {
-            res.json({status: 0, msg: "not found"});
+            res.json({status: 0,website_data:"{}", msg: "not found"});
         }
         res.json({status: 1, website_data: data, message: " success"});
     });
