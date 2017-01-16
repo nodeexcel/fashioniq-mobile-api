@@ -22,15 +22,16 @@ function getRegexString(string) {
 var express = require('express');
 var router = express.Router();
 router.all('/list', function (req, res) {
-    var users = req.conn_website_scrap_data;
-    users.find({website: 'shopclues'}, function (err, data) {
+    var website_list = req.conn_website_scrap_data;
+    var website_name = req.body.website_name;
+    website_list.find({website: website_name}, function (err, data) {
         if (err) {
             res.json({status: 0, message: err});
+        } else if (!data[0]) {
+            res.json({status: 0, count_products: '0', website_data: "{}", msg: "not found"});
+        } else {
+            res.json({status: 1, count_products: data.length, website_data: data, message: " success"});
         }
-        if (!data) {
-            res.json({status: 0,website_data:"{}", msg: "not found"});
-        }
-        res.json({status: 1, website_data: data, message: " success"});
     });
     // if (req.method === 'OPTIONS') {
     //     res.json('');
