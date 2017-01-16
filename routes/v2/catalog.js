@@ -52,8 +52,18 @@ router.all('/list', function (req, res) {
         }
     }
 });
+
 router.all('/filters', function (req, res, next) {
-    console.log('AAAAAAAAAAA')
+    var users = req.conn_website_scrap_data;
+    users.find({website: 'shopclues'}, function (err, data) {
+            if (err) {
+                res.json({status: 0, message: err});
+            }
+            if (!data) {
+                res.json({status: 0, msg: "not found"});
+            }
+            res.json({status: 1, website_data:data, message: " success"});
+        });
     // if (req.method === 'OPTIONS') {
     //     res.json('');
     // } else {

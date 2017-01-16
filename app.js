@@ -20,6 +20,7 @@ var module_product = require('./modules/product');
 var module_webp = require('./modules/webp');
 var cache = require('./modules/cache');
 
+var catalog = require('./routes/v2/catalog');
 var v1_routes_catalog = require('./routes/v1/catalog'); // arun :: 1st step
 var v1_routes_account = require('./routes/v1/account');
 var v1_routes_wishlist = require('./routes/v1/wishlist');
@@ -68,7 +69,7 @@ app.use(user_helper());
 app.use(list_helper());
 app.use(html_helper());
 app.use(module_webp());
-
+app.use('/v2_routes_catalog', catalog);
 app.use(function (req, res, next) {
     var path = req.path;
 
