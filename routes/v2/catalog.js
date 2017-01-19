@@ -21,13 +21,14 @@ function getRegexString(string) {
 
 var express = require('express');
 var router = express.Router();
+var _ = require('lodash');
 
 router.all('/list', function (req, res) {
     var website_list = req.conn_website_scrap_data;
     website_list.aggregate([
         {
             $group: {
-                _id: '$website', //$region is the column name in collection
+                _id: '$website', //$website is the column name in collection
                 count_products: {$sum: 1},
             }
         }
@@ -36,45 +37,16 @@ router.all('/list', function (req, res) {
             console.log(err);
             next(err);
         } else {
-            var Websites = [];
-            for (i = 0; i < result.length; i++) {
+            var websites = [];
+            _.each(result, function (data) {
                 var obj = {};
-                obj.name = result[i]._id;
-                obj.count_products = result[i].count_products;
-                Websites.push(obj);
-            }
-            res.json({'API Response': {'Websites': Websites}});
+                obj.name = data._id;
+                obj.count_products = data.count_products;
+                websites.push(obj);
+            })
+            res.json({'websites': websites});
         }
     });
-
-    // if (req.method === 'OPTIONS') {
-    //     res.json('');
-    // } else {
-    //     if (typeof req.recycle_data.father_wise_listing_status != 'undefined') {
-    //         var father_wise_listing_status = req.recycle_data.father_wise_listing_status;
-    //         if (father_wise_listing_status == 2) {
-    //             res.json({
-    //                 error: 2,
-    //                 message: req.recycle_data.father_wise_listing_msg
-    //             });
-    //         } else if (father_wise_listing_status == 1) {
-    //             res.json({
-    //                 error: 1,
-    //                 message: req.recycle_data.father_wise_listing_msg
-    //             });
-    //         } else if (father_wise_listing_status == 0) {
-    //             res.json({
-    //                 error: 0,
-    //                 data: req.recycle_data.father_wise_listing
-    //             });
-    //         }
-    //     } else {
-    //         res.json({
-    //             error: 1,
-    //             message: 'check module-recylce_data.js'
-    //         });
-    //     }
-    // }
 });
 
 router.all('/filters', function (req, res, next) {
