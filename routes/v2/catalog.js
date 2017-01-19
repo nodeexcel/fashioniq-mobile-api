@@ -799,7 +799,6 @@ router.all('/products/:website/:page/:limit', function (req, res, next) {
     } else {
         res.json({error: 'website ,name or page cannot be empty'});
     }
-
     // var redis = req.redis;
     // if (req.method === 'OPTIONS') {
     //     res.json('');
