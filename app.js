@@ -20,7 +20,8 @@ var module_product = require('./modules/product');
 var module_webp = require('./modules/webp');
 var cache = require('./modules/cache');
 
-var v1_routes_catalog = require('./routes/v1/catalog'); // arun :: 1st step
+var v2_routes_catalog = require('./routes/v2/catalog');  //shekhar :: ist step
+// var v1_routes_catalog = require('./routes/v1/catalog'); // arun :: 1st step
 var v1_routes_account = require('./routes/v1/account');
 var v1_routes_wishlist = require('./routes/v1/wishlist');
 var v1_routes_product = require('./routes/v1/product');
@@ -68,7 +69,7 @@ app.use(user_helper());
 app.use(list_helper());
 app.use(html_helper());
 app.use(module_webp());
-
+// app.use('/v2/routes_catalog', v2_routes_catalog);
 app.use(function (req, res, next) {
     var path = req.path;
 
@@ -122,7 +123,8 @@ app.use(function (req, res, next) {
     next();
 });
 // work accroding to version basis 
-app.use('/v1/catalog', v1_routes_catalog);
+app.use('/v2/catalog', v2_routes_catalog);
+// app.use('/v1/catalog', v1_routes_catalog);
 app.use('/v1/account', v1_routes_account);
 app.use('/v1/wishlist', v1_routes_wishlist);
 app.use('/v1/product', v1_routes_product);
