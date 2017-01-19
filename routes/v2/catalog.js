@@ -778,30 +778,20 @@ router.all('/products', function (req, res, next) {
     var website_name = req.body.website;
     var page = req.body.page;
     var limit = req.body.limit;
-    if (!page) {
+    if (!page || !isNaN(page) == false) {
         page = 1;
     }
-    if (!limit) {
+    if (!limit || !isNaN(limit) == false) {
         limit = 30;
     }
     if (website_name) {
-        if (!isNaN(page) == true) {
-            if (!isNaN(limit) == true) {
-                website_list.find({website: website_name}).sort('-1').skip(page * 10).limit(limit).exec(function (err, results) {
-                    if (err) {
-                        res.json({error: 1, message: err, data: {'products': '[]'}});
-                    } else if (!results.length == 0) {
-                        res.json({error: 0, message: 'success', data: {'products': results}});
-                    } else {
-                        res.json({error: 0, message: 'success', data: {'products': results}});
-                    }
-                });
+        website_list.find({website: website_name}).sort('-1').skip((page - 1) * limit).limit(limit).exec(function (err, results) {
+            if (err) {
+                res.json({error: 1, message: err, data: {'products': '[]'}});
             } else {
-                res.json({error: 1, message: 'limit must be in numeric form', data: {'products': '[]'}});
+                res.json({error: 0, message: 'success', data: {'products': results}});
             }
-        } else {
-            res.json({error: 1, message: 'page must be in numeric form', data: {'products': '[]'}});
-        }
+        });
     } else {
         res.json({error: 1, message: 'website name cannot be empty', data: {'products': '[]'}});
     }
