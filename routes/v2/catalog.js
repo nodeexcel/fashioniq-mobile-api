@@ -23,14 +23,46 @@ var express = require('express');
 var router = express.Router();
 router.all('/list', function (req, res) {
     var website_list = req.conn_website_scrap_data;
-    var website_name = req.body.website_name;
-    website_list.find({website: website_name}, function (err, data) {
+    website_list.find({scrap_source: "pg_scrap_master"}, function (err, data) {
         if (err) {
             res.json({status: 0, message: err});
-        } else if (!data[0]) {
-            res.json({status: 0, count_products: '0', website_data: "{}", msg: "not found"});
-        } else {
-            res.json({status: 1, count_products: data.length, website_data: data, message: " success"});
+        }
+        if (data) {
+            var paytm_data = [];
+            var shopclues_data = [];
+            var snapdeal_data = [];
+            var flipkart_data = [];
+            var amazon_data = [];
+            for (var a = 0; a < data.length; a++) {
+                var obj = {};
+                var row = data[a];
+                var name = row.get('name');
+                var website = row.get('website');
+                obj.name = name;
+                obj.website = website;
+                if (website == 'paytm') {
+                    paytm_data.push(obj);
+                }
+                if (website == 'shopclues') {
+                    shopclues_data.push(obj);
+                }
+                if (website == 'Snapdeal') {
+                    snapdeal_data.push(obj);
+                }
+                if (website == 'amazon') {
+                    amazon_data.push(obj);
+                }
+                if (website == 'Flipkart') {
+                    flipkart_data.push(obj);
+                }
+            }
+            var Websites = [];
+            Websites.push({'name': 'paytm', count_products: paytm_data.length});
+            Websites.push({'name': 'shopclues', count_products: shopclues_data.length});
+            Websites.push({'name': 'Snapdeal', count_products: snapdeal_data.length});
+            Websites.push({'name': 'amazon', count_products: amazon_data.length});
+            Websites.push({'name': 'Flipkart', count_products: flipkart_data.length});
+            res.json({'API Response': {'Websites': Websites}});
         }
     });
     // if (req.method === 'OPTIONS') {
