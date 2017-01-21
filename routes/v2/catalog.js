@@ -301,5 +301,4 @@ router.all('/search', function (req, res) {
         res.json({error: 1, message: 'website name or website category cannot be empty', data: {'products': []}});
     }
 });
-
 module.exports = router;
