@@ -34,7 +34,7 @@ router.all('/list', function (req, res) {
         }
     ], function (err, result) {
         if (err) {
-            console.log(err);
+             res.json({error: 1, message: err, data: {'websites': '[]'}});
             next(err);
         } else {
             var websites = [];
@@ -44,7 +44,7 @@ router.all('/list', function (req, res) {
                 obj.count_products = data.count_products;
                 websites.push(obj);
             })
-            res.json({'websites': websites});
+            res.json({error: 0, message: 'success', data: {'websites': websites}});
         }
     });
 });
