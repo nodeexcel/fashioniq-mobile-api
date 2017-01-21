@@ -790,22 +790,7 @@ router.all('/products', function (req, res, next) {
             if (err) {
                 res.json({error: 1, message: err, data: {'products': '[]'}});
             } else {
-                website_list.find({website: website_name}).exec(function (err, results) {
-                    var total_value = results.length / limit;
-                    var previousPage,
-                            nextPage;
-                    if (Number(page) == 1) {
-                        previousPage = 1;
-                        nextPage = Number(page) + 1;
-                    } else if (Number(page) > total_value) {
-                        previousPage = Math.floor(total_value);
-                        nextPage = 'not available';
-                    } else {
-                        previousPage = Number(page) - 1;
-                        nextPage = Number(page) + 1;
-                    }
-                    res.json({error: 0, message: 'success', data: {'products': results, nextPage: nextPage, previousPage: previousPage}});
-                });
+                 res.json({error: 0, message: 'success', data: {'products': results, nextPage: Number(page) + 1, previousPage: Number(page) - 1}});
             }
         });
     } else {
