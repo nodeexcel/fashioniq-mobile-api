@@ -34,7 +34,7 @@ router.all('/list', function (req, res) {
         }
     ], function (err, result) {
         if (err) {
-             res.json({error: 1, message: err, data: {'websites': '[]'}});
+            res.json({error: 1, message: err, data: {'websites': '[]'}});
             next(err);
         } else {
             var websites = [];
@@ -44,7 +44,8 @@ router.all('/list', function (req, res) {
                 obj.count_products = data.count_products;
                 websites.push(obj);
             })
-            res.json({error: 0, message: 'success', data: {'websites': websites}});
+            res.json({error: 0, message: 'success', data: {'websites': websites
+                }});
         }
     });
 });
@@ -778,10 +779,10 @@ router.all('/products', function (req, res, next) {
     var website_name = req.body.website;
     var page = req.body.page;
     var limit = req.body.limit;
-    if (!page || !isNaN(page) == false) {
+    if (!page || !isNaN(page) == false || page <= 0) {
         page = 1;
     }
-    if (!limit || !isNaN(limit) == false) {
+    if (!limit || !isNaN(limit) == false || limit <= 0) {
         limit = 30;
     }
     if (website_name) {
@@ -789,7 +790,22 @@ router.all('/products', function (req, res, next) {
             if (err) {
                 res.json({error: 1, message: err, data: {'products': '[]'}});
             } else {
-                res.json({error: 0, message: 'success', data: {'products': results}});
+                website_list.find({website: website_name}).exec(function (err, results) {
+                    var total_value = results.length / limit;
+                    var previousPage,
+                            nextPage;
+                    if (Number(page) == 1) {
+                        previousPage = 1;
+                        nextPage = Number(page) + 1;
+                    } else if (Number(page) > total_value) {
+                        previousPage = Math.floor(total_value);
+                        nextPage = 'not available';
+                    } else {
+                        previousPage = Number(page) - 1;
+                        nextPage = Number(page) + 1;
+                    }
+                    res.json({error: 0, message: 'success', data: {'products': results, nextPage: nextPage, previousPage: previousPage}});
+                });
             }
         });
     } else {
