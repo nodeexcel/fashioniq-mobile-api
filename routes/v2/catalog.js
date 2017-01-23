@@ -262,42 +262,43 @@ router.all('/search', function (req, res) {
         limit = 30;
     }
     if (website_name && text) {
-        var search_data = {website: website_name, website_category: text}
+    var search_data = {website: {$in: [website_name]}, website_category: text}
+    // var search_data = {website: website_name, website_category: text}
     } else if (website_name) {
-        search_data = {website: website_name}
+    search_data = {website: {$in: [website_name]}
     } else if (text) {
-        search_data = {website_category: text}
+    search_data = {website_category: text}
     }
     if (search_data) {
-        website_list.find(search_data).sort('-1').skip((page - 1) * limit).limit(limit).exec(function (err, results) {
-            if (err) {
-                res.json({error: 1, message: err, data: {'products': []}});
-            } else {
-                website_list.aggregate([
-                    {$match: {'website_category': text}},
-                    {$group: {
-                            _id: '$website',
-                            count_products: {$sum: 1},
-                        }
+    website_list.find(search_data).sort('-1').skip((page - 1) * limit).limit(limit).exec(function (err, results) {
+        if (err) {
+            res.json({error: 1, message: err, data: {'products': []}});
+        } else {
+            website_list.aggregate([
+                {$match: {'website_category': text}},
+                {$group: {
+                        _id: '$website',
+                        count_products: {$sum: 1},
                     }
-                ]).exec(function (err, result) {
-                    if (err) {
-                        res.json({error: 1, message: err, data: {'websites': []}});
-                    } else {
-                        var websites = [];
-                        _.each(result, function (data) {
-                            var obj = {};
-                            obj.name = data._id;
-                            obj.count_products = data.count_products;
-                            websites.push(obj);
-                        })
-                        res.json({error: 0, message: 'success', data: {'products': results, 'websites': websites, nextPage: Number(page) + 1, previousPage: Number(page) - 1, searchText: text}});
-                    }
-                });
-            }
-        });
+                }
+            ]).exec(function (err, result) {
+                if (err) {
+                    res.json({error: 1, message: err, data: {'websites': []}});
+                } else {
+                    var websites = [];
+                    _.each(result, function (data) {
+                        var obj = {};
+                        obj.name = data._id;
+                        obj.count_products = data.count_products;
+                        websites.push(obj);
+                    })
+                    res.json({error: 0, message: 'success', data: {'products': results, 'websites': websites, nextPage: Number(page) + 1, previousPage: Number(page) - 1, searchText: text}});
+                }
+            });
+        }
+    });
     } else {
-        res.json({error: 1, message: 'website name or website category cannot be empty', data: {'products': []}});
-    }
+    res.json({error: 1, message: 'website name or website category cannot be empty', data: {'products': []}});
+}
 });
-module.exports = router;
+        module.exports = router;
