@@ -251,8 +251,8 @@ router.all('/products', function (req, res, next) {
 
 router.all('/search', function (req, res) {
     var website_list = req.conn_website_scrap_data;
-    var website_name = req.body.website;
-    var text = req.body.text;
+    var websites_name = req.body.websites;
+    var search_text = req.body.search_text;
     var page = req.body.page;
     var limit = req.body.limit;
     if (!page || !isNaN(page) == false || page <= 0) {
@@ -261,21 +261,13 @@ router.all('/search', function (req, res) {
     if (!limit || !isNaN(limit) == false || limit <= 0) {
         limit = 30;
     }
-    if (website_name && text) {
-        var search_data = {website: {$in: [website_name]}, website_category: text}
-        // var search_data = {website: website_name, website_category: text}
-    } else if (website_name) {
-        search_data = {website: {$in: [website_name]}}
-    } else if (text) {
-        search_data = {website_category: text}
-    }
-    if (search_data) {
-        website_list.find(search_data).sort('-1').skip((page - 1) * limit).limit(limit).exec(function (err, results) {
+    if (websites_name && search_text) {
+        website_list.find({website: {$in: [websites_name]}, name: search_text}).sort('-1').skip((page - 1) * limit).limit(limit).exec(function (err, results) {
             if (err) {
                 res.json({error: 1, message: err, data: {'products': []}});
             } else {
                 website_list.aggregate([
-                    {$match: {'website_category': text}},
+                    {$match: {'name': search_text}},
                     {$group: {
                             _id: '$website',
                             count_products: {$sum: 1},
@@ -292,13 +284,14 @@ router.all('/search', function (req, res) {
                             obj.count_products = data.count_products;
                             websites.push(obj);
                         })
-                        res.json({error: 0, message: 'success', data: {'products': results, 'websites': websites, nextPage: Number(page) + 1, previousPage: Number(page) - 1, searchText: text}});
+                        res.json({error: 0, message: 'success', data: {'products': results, 'websites': websites, nextPage: Number(page) + 1, previousPage: Number(page) - 1, searchText: search_text}});
                     }
                 });
             }
         });
     } else {
-        res.json({error: 1, message: 'website name or website category cannot be empty', data: {'products': []}});
+        res.json({error: 1, message: 'website name or search text cannot be empty', data: {'products': []}});
     }
 });
+
 module.exports = router;
