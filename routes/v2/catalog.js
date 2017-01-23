@@ -252,7 +252,7 @@ router.all('/products', function (req, res, next) {
 router.all('/search', function (req, res) {
     var website_list = req.conn_website_scrap_data;
     var website_name = req.body.website;
-    var website_category = req.body.website_category;
+    var text = req.body.text;
     var page = req.body.page;
     var limit = req.body.limit;
     if (!page || !isNaN(page) == false || page <= 0) {
@@ -261,12 +261,12 @@ router.all('/search', function (req, res) {
     if (!limit || !isNaN(limit) == false || limit <= 0) {
         limit = 30;
     }
-    if (website_name && website_category) {
-        var search_data = {website: website_name, website_category: website_category}
+    if (website_name && text) {
+        var search_data = {website: website_name, website_category: text}
     } else if (website_name) {
         search_data = {website: website_name}
-    } else if (website_category) {
-        search_data = {website_category: website_category}
+    } else if (text) {
+        search_data = {website_category: text}
     }
     if (search_data) {
         website_list.find(search_data).sort('-1').skip((page - 1) * limit).limit(limit).exec(function (err, results) {
@@ -274,16 +274,15 @@ router.all('/search', function (req, res) {
                 res.json({error: 1, message: err, data: {'products': []}});
             } else {
                 website_list.aggregate([
-                    {
-                        $group: {
-                            _id: '$website', //$website is the column name in collection
+                    {$match: {'website_category': text}},
+                    {$group: {
+                            _id: '$website',
                             count_products: {$sum: 1},
                         }
                     }
-                ], function (err, result) {
+                ]).exec(function (err, result) {
                     if (err) {
                         res.json({error: 1, message: err, data: {'websites': []}});
-                        next(err);
                     } else {
                         var websites = [];
                         _.each(result, function (data) {
@@ -292,7 +291,7 @@ router.all('/search', function (req, res) {
                             obj.count_products = data.count_products;
                             websites.push(obj);
                         })
-                        res.json({error: 0, message: 'success', data: {'products': results, 'websites': websites, nextPage: Number(page) + 1, previousPage: Number(page) - 1, searchText: website_category}});
+                        res.json({error: 0, message: 'success', data: {'products': results, 'websites': websites, nextPage: Number(page) + 1, previousPage: Number(page) - 1, searchText: text}});
                     }
                 });
             }
