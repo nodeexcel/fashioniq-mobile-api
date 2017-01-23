@@ -262,7 +262,7 @@ router.all('/search', function (req, res) {
         limit = 30;
     }
     if (websites_name && search_text) {
-        website_list.find({website: {$in: JSON.parse(websites_name)}, name: search_text}).sort('-1').skip((page - 1) * limit).limit(limit).exec(function (err, results) {
+        website_list.find({website: {$in: JSON.parse(websites_name)}, 'name': {'$regex': new RegExp(search_text, "i")}}).sort('-1').skip((page - 1) * limit).limit(limit).exec(function (err, results) {
             if (err) {
                 res.json({error: 1, message: err, data: {'products': []}});
             } else {
