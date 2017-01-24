@@ -267,7 +267,7 @@ router.all('/search', function (req, res) {
                 res.json({error: 1, message: err, data: {'products': []}});
             } else {
                 website_list.aggregate([
-                    {$match: {'name': search_text}},
+                    {$match: {'name': {'$regex': new RegExp(search_text, "i")}}},
                     {$group: {
                             _id: '$website',
                             count_products: {$sum: 1},
@@ -284,6 +284,7 @@ router.all('/search', function (req, res) {
                             obj.count_products = data.count_products;
                             websites.push(obj);
                         })
+
                         res.json({error: 0, message: 'success', data: {'products': results, 'websites': websites, nextPage: Number(page) + 1, previousPage: Number(page) - 1, searchText: search_text}});
                     }
                 });
