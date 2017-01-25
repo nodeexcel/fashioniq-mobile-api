@@ -79,8 +79,8 @@ router.all('/view', function (req, res, next) {
     } else {
         var body = req.body;
         var productObj = req.productObj;
-        var product_id = body.product_id;
-        //var product_id = '551984740155684e3e97880a'; //for testing
+        // var product_id = body.product_id;
+        var product_id = '58834c514e25e2e9058b4567'; //for testing
         var category = req.conn_category;
         var website_scrap_data = req.conn_website_scrap_data;
         if (typeof product_id === 'undefined') {
@@ -167,10 +167,10 @@ router.all('/view', function (req, res, next) {
                             } else {
                                 data.set('cat_name', '');
                                 data.set('parent_cat_name', '');
-                                if (Object.keys(catData).length > 0) {
-                                    data.set('cat_name', catData.get('name'));
-                                    data.set('parent_cat_name', catData.get('parent_cat_name'));
-                                }
+                                // if (Object.keys(catData).length > 0) {
+                                //     data.set('cat_name', catData.get('name'));
+                                //     data.set('parent_cat_name', catData.get('parent_cat_name'));
+                                // }
                                 product_data.product = productObj.getProductPermit(req, data);
                                 req.toCache = true;
                                 req.cache_data = product_data;

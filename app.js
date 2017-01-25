@@ -24,7 +24,8 @@ var v2_routes_catalog = require('./routes/v2/catalog');  //shekhar :: ist step
 // var v1_routes_catalog = require('./routes/v1/catalog'); // arun :: 1st step
 var v1_routes_account = require('./routes/v1/account');
 var v1_routes_wishlist = require('./routes/v1/wishlist');
-var v1_routes_product = require('./routes/v1/product');
+// var v1_routes_product = require('./routes/v1/product');
+var v2_routes_product= require('./routes/v2/product');
 var v1_routes_feedback = require('./routes/v1/feedback');
 var v1_routes_parseurl = require('./routes/v1/parseurl');
 var v1_routes_notify = require('./routes/v1/notify');
@@ -127,7 +128,9 @@ app.use('/v2/catalog', v2_routes_catalog);
 // app.use('/v1/catalog', v1_routes_catalog);
 app.use('/v1/account', v1_routes_account);
 app.use('/v1/wishlist', v1_routes_wishlist);
-app.use('/v1/product', v1_routes_product);
+
+app.use('/v2/product', v2_routes_product);
+// app.use('/v1/product', v1_routes_product);
 app.use('/v1/feedback', v1_routes_feedback);
 app.use('/v1/friends', require('./routes/v1/invite'));
 app.use('/v1/social', require('./routes/v1/social'));
