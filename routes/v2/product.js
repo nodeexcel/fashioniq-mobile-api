@@ -79,8 +79,8 @@ router.all('/view', function (req, res, next) {
     } else {
         var body = req.body;
         var productObj = req.productObj;
-        var product_id = body.product_id;
-        // var product_id = '58834c514e25e2e9058b4567'; //for testing
+        // var product_id = body.product_id;
+        var product_id = '587397ac41f49a326548bc03'; //for testing
         var category = req.conn_category;
         var website_scrap_data = req.conn_website_scrap_data;
         if (typeof product_id === 'undefined') {
@@ -118,8 +118,8 @@ router.all('/view', function (req, res, next) {
                         var is_model_no_product = false;
                         product_name = data.get('name');
                         product_website = data.get('website');
-                        product_cat_id = data.get('cat_id');
-                        product_sub_cat_id = data.get('sub_cat_id');
+                        // product_cat_id = data.get('cat_id');
+                        // product_sub_cat_id = data.get('sub_cat_id');
                         product_brand = data.get('brand');
                         product_model_no = '';
 
@@ -132,7 +132,6 @@ router.all('/view', function (req, res, next) {
                         data.set('website_filter_key', '');
                         data.set('price_drop', 0);
                         data.set('price_history_new', []);
-
 
                         if (typeof product_brand != 'undefined' && product_brand != '') {
                             var brand1 = stringToArray(product_brand, ' ');
@@ -155,12 +154,11 @@ router.all('/view', function (req, res, next) {
                             //product_data.price_history = modifyPriceHistoryForJson(product_price_history);
                             data.set('price_history_new', modifyPriceHistoryForJson(product_price_history));
                         }
-
-                        where_category = {
-                            'cat_id': product_cat_id * 1,
-                            'sub_cat_id': product_sub_cat_id * 1,
-                        };
-                        category.where(where_category).findOne(cat_info);
+                        // where_category = {
+                        //     'cat_id': product_cat_id * 1,
+                        //     'sub_cat_id': product_sub_cat_id * 1,
+                        // };
+                        category.findOne(cat_info);
                         function cat_info(err, catData) {
                             if (err) {
                                 next(err);
@@ -580,11 +578,11 @@ router.all('/variant_old', function (req, res, next) {
                         console.log(where_variant);
                         website_scrap_data.aggregate(
                                 {$match: where_variant},
-                        {$sort: {score: {$meta: "textScore"}}},
+                                {$sort: {score: {$meta: "textScore"}}},
                         //{$limit: 1000},
-                        {$group: {'_id': '$website', 'data': {$push: "$$ROOT"}}},
+                                {$group: {'_id': '$website', 'data': {$push: "$$ROOT"}}},
                         //{$project: project_project},
-                        data_var_res
+                                data_var_res
                                 );
                         function data_var_res(err, data_var) {
                             if (err) {
@@ -612,8 +610,7 @@ router.all('/variant_old', function (req, res, next) {
                                         error: 0,
                                         data: variant_arr,
                                     });
-                                }
-                                else if (is_model_no_product == true) {
+                                } else if (is_model_no_product == true) {
                                     //start---this will execute if products found with model is NULL
                                     if (is_model_no_product == true) {
                                         console.log('!!model -- will check without model no!!!');
@@ -621,11 +618,11 @@ router.all('/variant_old', function (req, res, next) {
                                         console.log(where_variant);
                                         website_scrap_data.aggregate(
                                                 {$match: where_variant},
-                                        {$sort: {score: {$meta: "textScore"}}},
+                                                {$sort: {score: {$meta: "textScore"}}},
                                         //{$limit: 1000},
-                                        {$group: {'_id': '$website', 'data': {$push: "$$ROOT"}}},
+                                                {$group: {'_id': '$website', 'data': {$push: "$$ROOT"}}},
                                         //{$project: project_project},
-                                        data_var_res2
+                                                data_var_res2
                                                 );
                                         function data_var_res2(err, data_var2) {
 
@@ -656,8 +653,7 @@ router.all('/variant_old', function (req, res, next) {
                                         }
                                     }
                                     //end---this will execute if products found with model is NULL
-                                }
-                                else {
+                                } else {
                                     res.json({
                                         error: 0,
                                         data: variant_arr,
