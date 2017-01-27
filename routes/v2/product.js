@@ -160,77 +160,68 @@ router.all('/similar', function (req, res, next) {
     var unique = body.unique;
     var website = body.website;
     var productObj = req.productObj;
-    var category = req.conn_category;
     var website_scrap_data = req.conn_website_scrap_data;
     if (product_id || unique && website) {
-        if (typeof product_id === 'undefined' && typeof unique === 'undefined') {
-            res.json({
-                error: 1,
-                message: 'Invalid Request',
-            });
+        var similar_arr = [];
+        if (product_id) {
+            var where = {
+                '_id': mongoose.Types.ObjectId(product_id)
+            };
         } else {
-            var similar_arr = [];
-            if (product_id) {
-                var where = {
-                    '_id': mongoose.Types.ObjectId(product_id)
-                };
+            var where = {
+                'unique': unique,
+                website: website
+            };
+        }
+        var product_data_list = req.config.product_data_list;
+        website_scrap_data.where(where).select(product_data_list).findOne(result);
+        function result(err, data) {
+            if (err) {
+                next(err);
             } else {
-                var where = {
-                    'unique': unique,
-                    website: website
-                };
-            }
-            var product_data_list = req.config.product_data_list;
-            website_scrap_data.where(where).select(product_data_list).findOne(result);
-            function result(err, data) {
-                if (err) {
-                    next(err);
+                if (data == null || data.length == 0) {
+                    res.json({
+                        error: 0,
+                        data: [],
+                        message: 'product not found for product_id ' + product_id,
+                    });
                 } else {
-                    if (data == null || data.length == 0) {
-                        res.json({
-                            error: 0,
-                            data: [],
-                            message: 'product not found for product_id ' + product_id,
-                        });
-                    } else {
-                        var is_model_no_product = false;
-                        product_name = data.get('name');
-                        product_website = data.get('website');
-                        //--------------------------------------------------
-                        if (product_name) {
-                            var split_name = product_name.split(' ');
-                            product_name = split_name.slice(0, 2).join(" ");
-                        }
-                        if (product_website && product_name) {
-                            website_scrap_data.find({website: product_website, 'name': {'$regex': new RegExp(product_name, "i")}}).sort('-1').limit(10).exec(function (err, data) {
-                                if (err) {
-                                    next(err);
-                                } else {
-                                    console.log('data found similar');
-                                    data_sim_res(err, data)
-                                }
-                            });
-                            function data_sim_res(err, data_sim) {
-                                if (err) {
-                                    next(err);
-                                } else {
-                                    if (data_sim) {
-                                        for (var i = 0; i < data_sim.length; i++) {
-                                            var row = data_sim[i];
-                                            var obj = row;
-                                            similar_arr.push(productObj.getProductPermit(req, obj));
-                                        }
-                                    }
-                                    res.json({
-                                        error: 0,
-                                        message: 'success',
-                                        data: similar_arr,
-                                    });
-                                }
+                    var is_model_no_product = false;
+                    product_name = data.get('name');
+                    product_website = data.get('website');
+                    if (product_name) {
+                        var split_name = product_name.split(' ');
+                        product_name = split_name.slice(0, 2).join(" ");
+                    }
+                    if (product_website && product_name) {
+                        website_scrap_data.find({website: product_website, _id: {'$nin': [mongoose.Types.ObjectId(product_id)]}, 'name': {'$regex': new RegExp(product_name, "i")}}).sort('-1').limit(10).exec(function (err, data) {
+                            if (err) {
+                                next(err);
+                            } else {
+                                console.log('data found similar');
+                                data_sim_res(err, data)
                             }
-                        } else {
-                            res.json({error: 1, message: 'product_website and product_name cannot be empty'});
+                        });
+                        function data_sim_res(err, data_sim) {
+                            if (err) {
+                                next(err);
+                            } else {
+                                if (data_sim) {
+                                    for (var i = 0; i < data_sim.length; i++) {
+                                        var row = data_sim[i];
+                                        var obj = row;
+                                        similar_arr.push(productObj.getProductPermit(req, obj));
+                                    }
+                                }
+                                res.json({
+                                    error: 0,
+                                    message: 'success',
+                                    data: similar_arr,
+                                });
+                            }
                         }
+                    } else {
+                        res.json({error: 1, message: 'product_website and product_name cannot be empty'});
                     }
                 }
             }
