@@ -193,7 +193,15 @@ router.all('/similar', function (req, res, next) {
                         product_name = split_name.slice(0, 2).join(" ");
                     }
                     if (product_website && product_name) {
-                        website_scrap_data.find({website: product_website, _id: {'$nin': [mongoose.Types.ObjectId(product_id)]}, 'name': {'$regex': new RegExp(product_name, "i")}}).sort('-1').limit(10).exec(function (err, data) {
+                        website_scrap_data.find({
+                            website: product_website,
+                            _id: {'$nin': [mongoose.Types.ObjectId(product_id)]},
+                            'name': {'$regex': new RegExp(product_name, "i")}
+                        }, {"score": {"$meta": "textScore"}}, {
+                            limit: 10,
+                            sort: {'score': {'$meta': "textScore"}},
+                            select: product_data_list
+                        }).sort({'score': {'$meta': "textScore"}}).exec(function (err, data) {
                             if (err) {
                                 next(err);
                             } else {
@@ -261,11 +269,18 @@ router.all('/variant', function (req, res, next) {
                         product_name = split_name.slice(0, 2).join(" ");
                     }
                     if (product_website && product_name) {
-                        website_scrap_data.find({website: {'$ne': product_website}, _id: {'$nin': [mongoose.Types.ObjectId(product_id)]}, 'name': {'$regex': new RegExp(product_name, "i")}}).sort('-1').limit(10).exec(function (err, data) {
+                        website_scrap_data.find({
+                            website: {'$ne': product_website},
+                            _id: {'$nin': [mongoose.Types.ObjectId(product_id)]},
+                            'name': {'$regex': new RegExp(product_name, "i")}
+                        }, {"score": {"$meta": "textScore"}}, {
+                            limit: 500,
+                            sort: {'score': {'$meta': "textScore"}},
+                            select: product_data_list
+                        }).sort({'score': {'$meta': "textScore"}}).exec(function (err, data) {
                             if (err) {
                                 next(err);
                             } else {
-                                console.log('data found similar');
                                 data_var_res(err, data)
                             }
                         });
