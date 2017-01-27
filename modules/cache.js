@@ -18,7 +18,6 @@ module.exports = function (mongoose) {
 
             var key = shasum.digest('hex');
             var redis = req.redis;
-
             console.log('setting cache key ' + key);
             var data = req.cache_data;
             data = JSON.stringify(data);
@@ -53,7 +52,6 @@ module.exports = function (mongoose) {
 
                 var key = shasum.digest('hex');
                 var redis = req.redis;
-
                 console.log('checking cache key ' + key);
                 redis.exists(key, function (err, response) {
                     console.log('response ' + response);
