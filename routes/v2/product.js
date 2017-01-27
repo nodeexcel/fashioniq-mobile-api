@@ -216,7 +216,7 @@ router.all('/similar', function (req, res, next) {
                                 res.json({
                                     error: 0,
                                     message: 'success',
-                                    data: similar_arr,
+                                    data: {products: [similar_arr]}
                                 });
                             }
                         }
