@@ -76,107 +76,92 @@ router.all('/view', function (req, res, next) {
     if (req.method === 'OPTIONS') {
         res.json('');
     } else {
+        var body = req.body;
         var productObj = req.productObj;
         var product_id = body.product_id;
-        // var product_id = '58834c514e25e2e9058b4567'; //for testing
         var category = req.conn_category;
         var website_scrap_data = req.conn_website_scrap_data;
-        if (typeof product_id === 'undefined') {
-            res.json({
-                error: 1,
-                message: 'product_id is not found',
-            });
-        } else {
-            var similar_arr = [];
-            var variant_arr = [];
-            var price_history_data = [];
-            var product_data = {
-                product: {},
-                similar: similar_arr,
-                variant: variant_arr,
-                //price_history:price_history_data,
-                //price_drop:0,
-                //brand_filter_key:'',
-            };
-            var where = {
-                '_id': mongoose.Types.ObjectId(product_id),
-            };
-            var product_data_list = req.config.product_data_list;
-            website_scrap_data.where(where).select(product_data_list).findOne(result);
-            function result(err, data) {
-                if (err) {
-                    next(err);
-                } else {
-                    if (data == null || data.length == 0) {
-                        res.json({
-                            error: 1,
-                            message: 'product not found for product_id ' + product_id,
-                        });
+        if (product_id) {
+            if (typeof product_id === 'undefined') {
+                res.json({
+                    error: 1,
+                    message: 'product_id is not found',
+                });
+            } else {
+                var similar_arr = [];
+                var variant_arr = [];
+                var price_history_data = [];
+                var product_data = {
+                    product: {},
+                    similar: similar_arr,
+                    variant: variant_arr,
+                };
+                var where = {
+                    '_id': mongoose.Types.ObjectId(product_id),
+                };
+                var product_data_list = req.config.product_data_list;
+                website_scrap_data.where(where).select(product_data_list).findOne(result);
+                function result(err, data) {
+                    if (err) {
+                        next(err);
                     } else {
-                        var is_model_no_product = false;
-                        product_name = data.get('name');
-                        product_website = data.get('website');
-                        // product_cat_id = data.get('cat_id');
-                        // product_sub_cat_id = data.get('sub_cat_id');
-                        product_brand = data.get('brand');
-                        product_model_no = '';
-
-                        if (typeof data.get('model_no') != 'undefined' && data.get('model_no') != '') {
-                            product_model_no = data.get('model_no');
-                            is_model_no_product = true;
-                            console.log(' product_model_no found :: ' + product_model_no);
-                        }
-                        data.set('brand_filter_key', '');
-                        data.set('website_filter_key', '');
-                        data.set('price_drop', 0);
-                        data.set('price_history_new', []);
-
-                        if (typeof product_brand != 'undefined' && product_brand != '') {
-                            var brand1 = stringToArray(product_brand, ' ');
-                            var brand2 = arrayToString(brand1, '_');
-                            //product_data.brand_filter_key = 'filter__text__brand__'+brand2;
-                            data.set('brand_filter_key', 'filter__text__brand__' + brand2);
-                        }
-                        if (typeof product_website != 'undefined' && product_website != '') {
-                            var website1 = stringToArray(product_website, ' ');
-                            var website2 = arrayToString(website1, '_');
-                            data.set('website_filter_key', 'filter__text__website__' + website2);
-                        }
-                        product_price_diff = data.get('price_diff');
-                        if (typeof product_price_diff != 'undefined') {
-                            //product_data.price_drop = product_price_diff;
-                            data.set('price_drop', product_price_diff);
-                        }
-                        product_price_history = data.get('price_history');
-                        if (typeof product_price_history != 'undefined' && product_price_history != null && product_price_history.length > 0) {
-                            //product_data.price_history = modifyPriceHistoryForJson(product_price_history);
-                            data.set('price_history_new', modifyPriceHistoryForJson(product_price_history));
-                        }
-                        // where_category = {
-                        //     'cat_id': product_cat_id * 1,
-                        //     'sub_cat_id': product_sub_cat_id * 1,
-                        // };
-                        category.findOne(cat_info);
-                        function cat_info(err, catData) {
-                            if (err) {
-                                next(err);
-                            } else {
-                                // data.set('cat_name', '');
-                                // data.set('parent_cat_name', '');
-                                // if (Object.keys(catData).length > 0) {
-                                //     data.set('cat_name', catData.get('name'));
-                                //     data.set('parent_cat_name', catData.get('parent_cat_name'));
-                                // }
-                                product_data.product = productObj.getProductPermit(req, data);
-                                res.json({error: 0, message: 'success', data: product_data});
+                        if (data == null || data.length == 0) {
+                            res.json({
+                                error: 1,
+                                message: 'product not found for product_id ' + product_id,
+                            });
+                        } else {
+                            var is_model_no_product = false;
+                            product_name = data.get('name');
+                            product_website = data.get('website');
+                            product_brand = data.get('brand');
+                            product_model_no = '';
+                            if (typeof data.get('model_no') != 'undefined' && data.get('model_no') != '') {
+                                product_model_no = data.get('model_no');
+                                is_model_no_product = true;
+                                console.log(' product_model_no found :: ' + product_model_no);
+                            }
+                            data.set('brand_filter_key', '');
+                            data.set('website_filter_key', '');
+                            data.set('price_drop', 0);
+                            data.set('price_history_new', []);
+                            if (typeof product_brand != 'undefined' && product_brand != '') {
+                                var brand1 = stringToArray(product_brand, ' ');
+                                var brand2 = arrayToString(brand1, '_');
+                                data.set('brand_filter_key', 'filter__text__brand__' + brand2);
+                            }
+                            if (typeof product_website != 'undefined' && product_website != '') {
+                                var website1 = stringToArray(product_website, ' ');
+                                var website2 = arrayToString(website1, '_');
+                                data.set('website_filter_key', 'filter__text__website__' + website2);
+                            }
+                            product_price_diff = data.get('price_diff');
+                            if (typeof product_price_diff != 'undefined') {
+                                data.set('price_drop', product_price_diff);
+                            }
+                            product_price_history = data.get('price_history');
+                            if (typeof product_price_history != 'undefined' && product_price_history != null && product_price_history.length > 0) {
+                                data.set('price_history_new', modifyPriceHistoryForJson(product_price_history));
+                            }
+                            category.findOne(cat_info);
+                            function cat_info(err, catData) {
+                                if (err) {
+                                    next(err);
+                                } else {
+                                    product_data.product = productObj.getProductPermit(req, data);
+                                    res.json({error: 0, message: 'success', data: product_data});
+                                }
                             }
                         }
                     }
                 }
             }
+        } else {
+            res.json({error: 0, message: 'product_id cannot be empty', data: {product: {}}});
         }
     }
 });
+
 router.all('/similar', function (req, res, next) {
     var body = req.body;
     var product_id = body.product_id;
