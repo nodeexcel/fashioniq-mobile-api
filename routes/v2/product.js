@@ -78,7 +78,6 @@ router.all('/view', function (req, res, next) {
         var body = req.body;
         var productObj = req.productObj;
         var product_id = body.product_id;
-        var category = req.conn_category;
         var website_scrap_data = req.conn_website_scrap_data;
         if (product_id) {
             if (typeof product_id === 'undefined') {
@@ -182,7 +181,7 @@ router.all('/similar', function (req, res, next) {
                 if (data == null || data.length == 0) {
                     res.json({
                         error: 0,
-                        data: [],
+                        data: {products: []},
                         message: 'product not found for product_id ' + product_id,
                     });
                 } else {
@@ -216,18 +215,18 @@ router.all('/similar', function (req, res, next) {
                                 res.json({
                                     error: 0,
                                     message: 'success',
-                                    data: similar_arr,
+                                    data: {products: [similar_arr]}
                                 });
                             }
                         }
                     } else {
-                        res.json({error: 1, message: 'product_website and product_name cannot be empty'});
+                        res.json({error: 1, message: 'product_website and product_name cannot be empty', data: {products: []}});
                     }
                 }
             }
         }
     } else {
-        res.json({error: 1, message: 'product_id or unique and website cannot be empty'});
+        res.json({error: 1, message: 'product_id or unique and website cannot be empty', data: {products: []}});
     }
 });
 
@@ -235,15 +234,8 @@ router.all('/variant', function (req, res, next) {
     var body = req.body;
     var product_id = body.product_id;
     var productObj = req.productObj;
-    //var product_id = '552cac783df12f4d5d08e00f'; //for testing
-    var category = req.conn_category;
     var website_scrap_data = req.conn_website_scrap_data;
-    if (typeof product_id === 'undefined') {
-        res.json({
-            error: 1,
-            message: 'product_id is not found',
-        });
-    } else {
+    if (product_id) {
         var variant_arr = [];
         var where = {
             '_id': mongoose.Types.ObjectId(product_id),
@@ -258,64 +250,29 @@ router.all('/variant', function (req, res, next) {
                     res.json({
                         error: 1,
                         message: 'product not found for product_id ' + product_id,
+                        data: []
                     });
                 } else {
                     var is_model_no_product = false;
                     product_name = data.get('name');
                     product_website = data.get('website');
-                    // product_cat_id = data.get('cat_id');
-                    // product_sub_cat_id = data.get('sub_cat_id');
-                    product_brand = data.get('brand');
-                    product_model_no = '';
-                    if (typeof data.get('model_no') != 'undefined' && data.get('model_no') != '') {
-                        product_model_no = data.get('model_no');
-                        is_model_no_product = true;
-                        console.log(' product_model_no found :: ' + product_model_no);
-                    }
-                    //--------------------------------------------------
-
                     if (product_name) {
                         var split_name = product_name.split(' ');
-                        var split_brand = product_brand.split(' ');
-                        if (split_brand.length > 1) {
-                            //three words
-
-                            product_name = split_name.slice(0, 3).join(" ");
-
-                        } else {
-                            //two words
-                            product_name = split_name.slice(0, 2).join(" ");
-                        }
+                        product_name = split_name.slice(0, 2).join(" ");
                     }
-                    where_variant = {
-                        '_id': {
-                            '$nin': [
-                                mongoose.Types.ObjectId(product_id),
-                            ]
-                        },
-                        // 'cat_id': product_cat_id * 1,
-                        // 'sub_cat_id': product_sub_cat_id * 1,
-                        'website': {'$ne': product_website},
-                        '$text': {'$search': product_name},
-                    };
-                    if (typeof product_brand != 'undefined' && product_brand != '') {
-                        where_variant['brand'] = new RegExp(product_brand, "i");
-                    }
-                    if (is_model_no_product == true) {
-                        where_variant['model_no'] = new RegExp(product_model_no, "i");
-                    }
-                    console.log('!! where_variant !!!');
-                    console.log(where_variant);
-                    website_scrap_data.find(where_variant, {"score": {"$meta": "textScore"}}, {
-                        limit: 500,
-                        sort: {'score': {'$meta': "textScore"}},
-                        select: product_data_list,
-                    }, data_var_res);
-                    function data_var_res(err, data_var) {
-                        if (err) {
-                            next(err);
-                        } else {
-                            if (typeof data_var != 'undefined' && data_var.length > 0) {
+                    if (product_website && product_name) {
+                        website_scrap_data.find({website: {'$ne': product_website}, _id: {'$nin': [mongoose.Types.ObjectId(product_id)]}, 'name': {'$regex': new RegExp(product_name, "i")}}).sort('-1').limit(10).exec(function (err, data) {
+                            if (err) {
+                                next(err);
+                            } else {
+                                console.log('data found similar');
+                                data_var_res(err, data)
+                            }
+                        });
+                        function data_var_res(err, data_var) {
+                            if (err) {
+                                next(err);
+                            } else {
                                 for (var i = 0; i < data_var.length; i++) {
                                     var row = data_var[i];
                                     var obj = row;
@@ -323,55 +280,19 @@ router.all('/variant', function (req, res, next) {
                                 }
                                 res.json({
                                     error: 0,
+                                    message: 'success',
                                     data: manipulateVariantData(variant_arr),
                                 });
-                            } else if (is_model_no_product == true) {
-                                console.log('!!model -- will check without model no!!!');
-                                delete where_variant.model_no;
-                                console.log(where_variant);
-// website_scrap_data.find({website: product_website, _id: {'$nin': [mongoose.Types.ObjectId(product_id)]}, 'name': {'$regex': new RegExp(product_name, "i")}}).sort('-1').limit(10).exec(function (err, data_var2) {
-                                website_scrap_data.find(where_variant, {"score": {"$meta": "textScore"}}, {
-                                    limit: 500,
-                                    sort: {'score': {'$meta': "textScore"}},
-                                    select: product_data_list,
-                                }, data_var_res2);
-                                function data_var_res2(err, data_var2) {
-                                    if (err) {
-                                        next(err);
-                                    } else {
-                                        if (typeof data_var2 != 'undefined' && data_var2.length > 0) {
-                                            for (var i = 0; i < data_var2.length; i++) {
-                                                var row = data_var2[i];
-                                                var obj = row;
-                                                variant_arr.push(productObj.getProductPermit(req, obj));
-                                            }
-                                            res.json({
-                                                error: 0,
-                                                data: manipulateVariantData(variant_arr),
-                                            });
-                                        } else {
-                                            res.json({
-                                                error: 0,
-                                                data: variant_arr,
-                                            });
-                                        }
-                                    }
-                                }
-                            } else {
-//                                res.json({
-//                                    error: 0,
-//                                    data: variant_arr,
-//                                });
-                                req.toCache = true;
-                                req.cache_data = variant_arr;
-                                req.cache_time = 60 * 60 * 24;
-                                next();
                             }
                         }
+                    } else {
+                        res.json({error: 1, message: 'product_website and product_name cannot be empty', data: []});
                     }
                 }
             }
         }
+    } else {
+        res.json({error: 1, message: 'product_id cannot be empty', data: []});
     }
 });
 
