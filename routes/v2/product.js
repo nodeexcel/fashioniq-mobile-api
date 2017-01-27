@@ -182,7 +182,7 @@ router.all('/similar', function (req, res, next) {
                 if (data == null || data.length == 0) {
                     res.json({
                         error: 0,
-                        data: [],
+                        data: {products: []},
                         message: 'product not found for product_id ' + product_id,
                     });
                 } else {
@@ -216,18 +216,18 @@ router.all('/similar', function (req, res, next) {
                                 res.json({
                                     error: 0,
                                     message: 'success',
-                                    data: similar_arr,
+                                    data: {products: [similar_arr]}
                                 });
                             }
                         }
                     } else {
-                        res.json({error: 1, message: 'product_website and product_name cannot be empty'});
+                        res.json({error: 1, message: 'product_website and product_name cannot be empty', data: {products: []}});
                     }
                 }
             }
         }
     } else {
-        res.json({error: 1, message: 'product_id or unique and website cannot be empty'});
+        res.json({error: 1, message: 'product_id or unique and website cannot be empty', data: {products: []}});
     }
 });
 
