@@ -72,7 +72,6 @@ function manipulateVariantData(data) {
 }
 
 router.all('/view', function (req, res, next) {
-    console.log('1')
     if (req.method === 'OPTIONS') {
         res.json('');
     } else {
@@ -143,15 +142,8 @@ router.all('/view', function (req, res, next) {
                             if (typeof product_price_history != 'undefined' && product_price_history != null && product_price_history.length > 0) {
                                 data.set('price_history_new', modifyPriceHistoryForJson(product_price_history));
                             }
-                            category.findOne(cat_info);
-                            function cat_info(err, catData) {
-                                if (err) {
-                                    next(err);
-                                } else {
-                                    product_data.product = productObj.getProductPermit(req, data);
-                                    res.json({error: 0, message: 'success', data: product_data});
-                                }
-                            }
+                            product_data.product = productObj.getProductPermit(req, data);
+                            res.json({error: 0, message: 'success', data: product_data});
                         }
                     }
                 }
