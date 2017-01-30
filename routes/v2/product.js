@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var mongoose = require('mongoose');
+var moment = require('moment');
 
 function stringToArray(str, expby) {
     var ret = new Array();
@@ -17,24 +18,13 @@ function stringToArray(str, expby) {
 function arrayToString(arr, impby) {
     return arr.join(impby);
 }
-function timeConverter(UNIX_timestamp) {
-    var a = new Date(UNIX_timestamp);
-    var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    var year = a.getFullYear();
-    var month = months[a.getMonth()];
-    var date = a.getDate();
-    var hour = a.getHours();
-    var min = a.getMinutes();
-    var sec = a.getSeconds();
-    var time = date + '-' + month;
-    return time;
-}
+
 function modifyPriceHistoryForJson(data) {
     var return_data = [];
     for (var i = 0; i < data.length; i++) {
         var rr = data[i];
-        var rr_time = rr['timestamp'];
-        rr['date'] = timeConverter(rr_time);
+        var rr_time = rr['date'];
+        rr['date1'] = moment(rr_time).format("Do MMM");               // Jan 30th
         return_data.push(rr);
     }
     return return_data;
