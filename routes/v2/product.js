@@ -18,18 +18,7 @@ function stringToArray(str, expby) {
 function arrayToString(arr, impby) {
     return arr.join(impby);
 }
-function timeConverter(UNIX_timestamp) {
-    var a = new Date(UNIX_timestamp);
-    var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    var year = a.getFullYear();
-    var month = months[a.getMonth()];
-    var date = a.getDate();
-    var hour = a.getHours();
-    var min = a.getMinutes();
-    var sec = a.getSeconds();
-    var time = date + '-' + month;
-    return time;
-}
+
 function modifyPriceHistoryForJson(data) {
     var return_data = [];
     for (var i = 0; i < data.length; i++) {
@@ -139,9 +128,7 @@ router.all('/view', function (req, res, next) {
                                 data.set('price_drop', product_price_diff);
                             }
                             product_price_history = data.get('price_history');
-                            // console.log(product_price_history)
                             if (typeof product_price_history != 'undefined' && product_price_history != null && product_price_history.length > 0) {
-                                console.log('1')
                                 data.set('price_history_new', modifyPriceHistoryForJson(product_price_history));
                             }
                             product_data.product = productObj.getProductPermit(req, data);
