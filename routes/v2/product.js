@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var mongoose = require('mongoose');
+var moment = require('moment');
 
 function stringToArray(str, expby) {
     var ret = new Array();
@@ -33,8 +34,8 @@ function modifyPriceHistoryForJson(data) {
     var return_data = [];
     for (var i = 0; i < data.length; i++) {
         var rr = data[i];
-        var rr_time = rr['timestamp'];
-        rr['date'] = timeConverter(rr_time);
+        var rr_time = rr['date'];
+        rr['date1'] = moment(rr_time).format("Do MMM");               // Jan 30th
         return_data.push(rr);
     }
     return return_data;
@@ -138,7 +139,9 @@ router.all('/view', function (req, res, next) {
                                 data.set('price_drop', product_price_diff);
                             }
                             product_price_history = data.get('price_history');
+                            // console.log(product_price_history)
                             if (typeof product_price_history != 'undefined' && product_price_history != null && product_price_history.length > 0) {
+                                console.log('1')
                                 data.set('price_history_new', modifyPriceHistoryForJson(product_price_history));
                             }
                             product_data.product = productObj.getProductPermit(req, data);
