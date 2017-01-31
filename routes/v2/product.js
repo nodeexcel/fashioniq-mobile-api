@@ -132,7 +132,13 @@ router.all('/view', function (req, res, next) {
                                 data.set('price_history_new', modifyPriceHistoryForJson(product_price_history));
                             }
                             product_data.product = productObj.getProductPermit(req, data);
-                            res.json({error: 0, message: 'success', data: product_data});
+                            website_scrap_data.findOneAndUpdate({_id: product_id}, {$inc: {count_views: 1}}, function (err, product1) {
+                                if (err) {
+                                    res.json({error: 1, message: err, data: []});
+                                } else {
+                                    res.json({error: 0, message: 'success', data: product_data, count_views: product1.toJSON().count_views});
+                                }
+                            });
                         }
                     }
                 }
