@@ -305,37 +305,16 @@ router.post('/like', function (req, res) {
     var body = req.body;
     var product_id = body.product_id;
     var website_scrap_data = req.conn_website_scrap_data;
-    if (product_id.length > 0) {
-        website_scrap_data.find({_id: product_id}, function (err, product) {
+    if (product_id) {
+        website_scrap_data.update({_id: product_id}, {$inc: {count_likes: 1}}, function (err, product) {
             if (err) {
                 res.json({error: 1, message: err, data: []});
-            }
-            if (!product) {
-                res.json({error: 1, message: 'product not found in db', data: []});
             } else {
-                var count_likes;
-                for (var a = 0; a < product.length; a++) {
-                    var row = product[a];
-                    count_likes = row.get('count_likes');
-                }
-                if (count_likes) {
-                } else {
-                    count_likes = 0;
-                }
-                website_scrap_data.findOneAndUpdate({_id: product_id}, {$set: {count_likes: count_likes + 1}}, function (err, product1) {
-                    if (err) {
-                        res.json({error: 1, message: err, data: []});
-                    }
-                    if (!product1) {
-                        res.json({error: 1, message: 'product not found in db', data: []});
-                    } else {
-                        res.json({error: 0, message: 'success', data: {count_likes:count_likes+1}});
-                    }
-                })
+                res.json({error: 0, message: 'success', data: {count_likes: product}});
             }
-        })
+        });
     } else {
-        es.json({error: 1, message: 'product_id cannot be empty', data: []});
+        res.json({error: 1, message: 'product_id cannot be empty', data: []});
     }
 });
 
