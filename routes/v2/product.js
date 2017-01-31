@@ -84,58 +84,56 @@ router.all('/view', function (req, res, next) {
                     similar: similar_arr,
                     variant: variant_arr,
                 };
-                var where = {
-                    '_id': mongoose.Types.ObjectId(product_id),
-                };
                 var product_data_list = req.config.product_data_list;
-                website_scrap_data.where(where).select(product_data_list).findOne(result);
-                function result(err, data) {
-                    if (err) {
-                        next(err);
-                    } else {
-                        if (data == null || data.length == 0) {
-                            res.json({
-                                error: 1,
-                                message: 'product not found for product_id ' + product_id,
-                            });
-                        } else {
-                            var is_model_no_product = false;
-                            product_name = data.get('name');
-                            product_website = data.get('website');
-                            product_brand = data.get('brand');
-                            product_model_no = '';
-                            if (typeof data.get('model_no') != 'undefined' && data.get('model_no') != '') {
-                                product_model_no = data.get('model_no');
-                                is_model_no_product = true;
-                                console.log(' product_model_no found :: ' + product_model_no);
+                website_scrap_data.findOneAndUpdate({_id: product_id}, {$inc: {count_views: 1}},
+                // {select:product_data_list},
+                        function (err, data) {
+                            if (err) {
+                                next(err);
+                            } else {
+                                if (data == null || data.length == 0) {
+                                    res.json({
+                                        error: 1,
+                                        message: 'product not found for product_id ' + product_id,
+                                    });
+                                } else {
+                                    var is_model_no_product = false;
+                                    product_name = data.get('name');
+                                    product_website = data.get('website');
+                                    product_brand = data.get('brand');
+                                    product_model_no = '';
+                                    if (typeof data.get('model_no') != 'undefined' && data.get('model_no') != '') {
+                                        product_model_no = data.get('model_no');
+                                        is_model_no_product = true;
+                                        console.log(' product_model_no found :: ' + product_model_no);
+                                    }
+                                    data.set('brand_filter_key', '');
+                                    data.set('website_filter_key', '');
+                                    data.set('price_drop', 0);
+                                    data.set('price_history_new', []);
+                                    if (typeof product_brand != 'undefined' && product_brand != '') {
+                                        var brand1 = stringToArray(product_brand, ' ');
+                                        var brand2 = arrayToString(brand1, '_');
+                                        data.set('brand_filter_key', 'filter__text__brand__' + brand2);
+                                    }
+                                    if (typeof product_website != 'undefined' && product_website != '') {
+                                        var website1 = stringToArray(product_website, ' ');
+                                        var website2 = arrayToString(website1, '_');
+                                        data.set('website_filter_key', 'filter__text__website__' + website2);
+                                    }
+                                    product_price_diff = data.get('price_diff');
+                                    if (typeof product_price_diff != 'undefined') {
+                                        data.set('price_drop', product_price_diff);
+                                    }
+                                    product_price_history = data.get('price_history');
+                                    if (typeof product_price_history != 'undefined' && product_price_history != null && product_price_history.length > 0) {
+                                        data.set('price_history_new', modifyPriceHistoryForJson(product_price_history));
+                                    }
+                                    product_data.product = productObj.getProductPermit(req, data);
+                                    res.json({error: 0, message: 'success', data: product_data});
+                                }
                             }
-                            data.set('brand_filter_key', '');
-                            data.set('website_filter_key', '');
-                            data.set('price_drop', 0);
-                            data.set('price_history_new', []);
-                            if (typeof product_brand != 'undefined' && product_brand != '') {
-                                var brand1 = stringToArray(product_brand, ' ');
-                                var brand2 = arrayToString(brand1, '_');
-                                data.set('brand_filter_key', 'filter__text__brand__' + brand2);
-                            }
-                            if (typeof product_website != 'undefined' && product_website != '') {
-                                var website1 = stringToArray(product_website, ' ');
-                                var website2 = arrayToString(website1, '_');
-                                data.set('website_filter_key', 'filter__text__website__' + website2);
-                            }
-                            product_price_diff = data.get('price_diff');
-                            if (typeof product_price_diff != 'undefined') {
-                                data.set('price_drop', product_price_diff);
-                            }
-                            product_price_history = data.get('price_history');
-                            if (typeof product_price_history != 'undefined' && product_price_history != null && product_price_history.length > 0) {
-                                data.set('price_history_new', modifyPriceHistoryForJson(product_price_history));
-                            }
-                            product_data.product = productObj.getProductPermit(req, data);
-                            res.json({error: 0, message: 'success', data: product_data});
-                        }
-                    }
-                }
+                        })
             }
         } else {
             res.json({error: 0, message: 'product_id cannot be empty', data: {product: {}}});
