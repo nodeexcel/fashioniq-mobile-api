@@ -306,11 +306,18 @@ router.post('/like', function (req, res) {
     var product_id = body.product_id;
     var website_scrap_data = req.conn_website_scrap_data;
     if (product_id) {
-        website_scrap_data.update({_id: product_id}, {$inc: {count_likes: 1}}, function (err, product) {
+        website_scrap_data.update({_id: product_id}, {$inc: {count_likes: 1}}, function (err, product1) {
             if (err) {
                 res.json({error: 1, message: err, data: []});
             } else {
-                res.json({error: 0, message: 'success', data: {count_likes: product}});
+                website_scrap_data.find({_id: product_id}, function (err, product) {
+                    var count_likes;
+                    for (var a = 0; a < product.length; a++) {
+                        var row = product[a];
+                        count_likes = row.get('count_likes');
+                    }
+                    res.json({error: 0, message: 'success', data: {count_likes: count_likes}});
+                });
             }
         });
     } else {
