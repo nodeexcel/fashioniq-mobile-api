@@ -301,4 +301,21 @@ router.all('/variant', function (req, res, next) {
     }
 });
 
+router.post('/like', function (req, res) {
+    var body = req.body;
+    var product_id = body.product_id;
+    var website_scrap_data = req.conn_website_scrap_data;
+    if (product_id) {
+        website_scrap_data.findOneAndUpdate({_id: product_id}, {$inc: {count_likes: 1}}, function (err, product1) {
+            if (err) {
+                res.json({error: 1, message: err, data: []});
+            } else {
+                res.json({error: 0, message: 'success', data: {count_likes: product1.toJSON().count_likes}});
+            }
+        });
+    } else {
+        res.json({error: 1, message: 'product_id cannot be empty', data: []});
+    }
+});
+
 module.exports = router;
