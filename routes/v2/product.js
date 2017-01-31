@@ -84,12 +84,8 @@ router.all('/view', function (req, res, next) {
                     similar: similar_arr,
                     variant: variant_arr,
                 };
-                var where = {
-                    '_id': mongoose.Types.ObjectId(product_id),
-                };
                 var product_data_list = req.config.product_data_list;
-                website_scrap_data.where(where).select(product_data_list).findOne(result);
-                function result(err, data) {
+                website_scrap_data.findOneAndUpdate({_id: product_id}, {$inc: {count_views: 1}}, function (err, data) {
                     if (err) {
                         next(err);
                     } else {
@@ -132,16 +128,10 @@ router.all('/view', function (req, res, next) {
                                 data.set('price_history_new', modifyPriceHistoryForJson(product_price_history));
                             }
                             product_data.product = productObj.getProductPermit(req, data);
-                            website_scrap_data.findOneAndUpdate({_id: product_id}, {$inc: {count_views: 1}}, function (err, product1) {
-                                if (err) {
-                                    res.json({error: 1, message: err, data: []});
-                                } else {
-                                    res.json({error: 0, message: 'success', data: product_data, count_views: product1.toJSON().count_views});
-                                }
-                            });
+                                    res.json({error: 0, message: 'success', data: product_data});
                         }
                     }
-                }
+                })
             }
         } else {
             res.json({error: 0, message: 'product_id cannot be empty', data: {product: {}}});
