@@ -230,18 +230,32 @@ router.all('/products', function (req, res, next) {
     var website_name = req.body.website;
     var page = req.body.page;
     var limit = req.body.limit;
+    var sort = req.body.sort;
     if (!page || !isNaN(page) == false || page <= 0) {
         page = 1;
     }
     if (!limit || !isNaN(limit) == false || limit <= 0) {
         limit = 30;
     }
+    if (sort == 'pricelth') {
+        var where_sort = {price: 1};
+        var sorting = {'text': 'Price -- Low to High', 'param': 'pricelth', 'sort': {'price': 1}};
+    } else if (sort == 'pricehtl') {
+        where_sort = {price: -1};
+        sorting = {'text': 'Price -- High to Low', 'param': 'pricehtl', 'sort': {'price': -1}};
+    } else {
+        where_sort = '-1';
+    }
     if (website_name) {
-        website_list.find({website: website_name}).sort('-1').skip((page - 1) * limit).limit(limit).exec(function (err, results) {
+        website_list.find({website: website_name}).sort(where_sort).skip((page - 1) * limit).limit(limit).exec(function (err, results) {
             if (err) {
                 res.json({error: 1, message: err, data: {'products': []}});
             } else {
-                res.json({error: 0, message: 'success', data: {'products': results, nextPage: Number(page) + 1, previousPage: Number(page) - 1}});
+                if (sort) {
+                    res.json({error: 0, message: 'success', data: {'products': results, nextPage: Number(page) + 1, previousPage: Number(page) - 1}, sort_list: [sorting]});
+                } else {
+                    res.json({error: 0, message: 'success', data: {'products': results, nextPage: Number(page) + 1, previousPage: Number(page) - 1}});
+                }
             }
         });
     } else {
