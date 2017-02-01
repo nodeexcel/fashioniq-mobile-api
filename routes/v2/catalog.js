@@ -1,3 +1,6 @@
+require('node-import');
+imports('config/index');
+
 function stringToArray(str, expby) {
     var ret = new Array();
     if (str) {
@@ -239,10 +242,8 @@ router.all('/products', function (req, res, next) {
     }
     if (sort == 'pricelth') {
         var where_sort = {price: 1};
-        var sorting = {'text': 'Price -- Low to High', 'param': 'pricelth', 'sort': {'price': 1}};
     } else if (sort == 'pricehtl') {
         where_sort = {price: -1};
-        sorting = {'text': 'Price -- High to Low', 'param': 'pricehtl', 'sort': {'price': -1}};
     } else {
         where_sort = '-1';
     }
@@ -251,11 +252,7 @@ router.all('/products', function (req, res, next) {
             if (err) {
                 res.json({error: 1, message: err, data: {'products': []}});
             } else {
-                if (sort) {
-                    res.json({error: 0, message: 'success', data: {'products': results, nextPage: Number(page) + 1, previousPage: Number(page) - 1}, sort_list: [sorting]});
-                } else {
-                    res.json({error: 0, message: 'success', data: {'products': results, nextPage: Number(page) + 1, previousPage: Number(page) - 1}});
-                }
+                res.json({error: 0, message: 'success', data: {'products': results, nextPage: Number(page) + 1, previousPage: Number(page) - 1}, sort_list: SORTING});
             }
         });
     } else {
