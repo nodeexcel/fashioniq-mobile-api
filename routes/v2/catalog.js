@@ -230,6 +230,10 @@ router.all('/products', function (req, res, next) {
     var website_name = req.body.website;
     var page = req.body.page;
     var limit = req.body.limit;
+    var sort = req.body.sort;
+    var where_sort;
+    var where;
+
     if (!page || !isNaN(page) == false || page <= 0) {
         page = 1;
     }
@@ -237,16 +241,28 @@ router.all('/products', function (req, res, next) {
         limit = 30;
     }
     if (website_name) {
-        website_list.find({website: website_name}).sort('-1').skip((page - 1) * limit).limit(limit).exec(function (err, results) {
-            if (err) {
-                res.json({error: 1, message: err, data: {'products': []}});
-            } else {
-                res.json({error: 0, message: 'success', data: {'products': results, nextPage: Number(page) + 1, previousPage: Number(page) - 1}});
+        where = {website: website_name};
+    } else {
+        where = '';
+    }
+    if (!sort) {
+        sort = 'likes';
+    }
+    if (sort) {
+        _.each(req.SORTING, function (data) {
+            if (data.param == sort) {
+                where_sort = data.sort;
             }
         });
-    } else {
-        res.json({error: 1, message: 'website name cannot be empty', data: {'products': []}});
     }
+    
+    website_list.find(where).sort(where_sort).skip((page - 1) * limit).limit(limit).exec(function (err, results) {
+        if (err) {
+            res.json({error: 1, message: err, data: {'products': []}});
+        } else {
+            res.json({error: 0, message: 'success', data: {'products': results, nextPage: Number(page) + 1, previousPage: Number(page) - 1}, sort_list: req.SORTING});
+        }
+    });
 });
 
 router.all('/search', function (req, res) {
