@@ -245,20 +245,17 @@ router.all('/products', function (req, res, next) {
     } else {
         where = '';
     }
+    if (!sort) {
+        sort = 'likes';
+    }
     if (sort) {
         _.each(req.SORTING, function (data) {
             if (data.param == sort) {
                 where_sort = data.sort;
             }
         });
-    } else {
-        _.each(req.SORTING, function (data) {
-            if (data.param == 'likes') {
-                where_sort = data.sort;
-            }
-        });
     }
-   
+    
     website_list.find(where).sort(where_sort).skip((page - 1) * limit).limit(limit).exec(function (err, results) {
         if (err) {
             res.json({error: 1, message: err, data: {'products': []}});
