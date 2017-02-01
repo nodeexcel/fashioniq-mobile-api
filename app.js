@@ -28,6 +28,8 @@ var v1_routes_wishlist = require('./routes/v1/wishlist');
 var v2_routes_product= require('./routes/v2/product');
 var v1_routes_feedback = require('./routes/v1/feedback');
 var v1_routes_parseurl = require('./routes/v1/parseurl');
+var v2_routes_parseurl = require('./routes/v2/parseurl');
+
 var v1_routes_notify = require('./routes/v1/notify');
 
 var app = express();
@@ -124,12 +126,10 @@ app.use(function (req, res, next) {
     next();
 });
 // work accroding to version basis 
-app.use('/v2/catalog', v2_routes_catalog);
+
 // app.use('/v1/catalog', v1_routes_catalog);
 app.use('/v1/account', v1_routes_account);
 app.use('/v1/wishlist', v1_routes_wishlist);
-
-app.use('/v2/product', v2_routes_product);
 // app.use('/v1/product', v1_routes_product);
 app.use('/v1/feedback', v1_routes_feedback);
 app.use('/v1/friends', require('./routes/v1/invite'));
@@ -139,6 +139,10 @@ app.use('/v1/picture', require('./routes/v1/picture'));
 app.use('/v1/parseurl', v1_routes_parseurl);
 app.use('/v1/feeds', require('./routes/v1/feeds'));
 app.use('/v1/notify', v1_routes_notify);
+
+app.use('/v2/catalog', v2_routes_catalog);
+app.use('/v2/product', v2_routes_product);
+app.use('/v2/parseurl', v2_routes_parseurl);
 
 //setting data into cache
 app.use(cache());
