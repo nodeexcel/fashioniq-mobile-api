@@ -302,34 +302,62 @@ router.all('/variant', function (req, res, next) {
 router.post('/like', function (req, res) {
     var body = req.body;
     var product_id = body.product_id;
+    var unique = body.unique;
+    var website = body.website;
     var website_scrap_data = req.conn_website_scrap_data;
-    if (product_id) {
-        website_scrap_data.findOneAndUpdate({_id: product_id}, {$inc: {count_likes: 1}}, function (err, product1) {
+    if (product_id || unique && website) {
+        if (product_id) {
+            var where = {
+                '_id': mongoose.Types.ObjectId(product_id)
+            };
+        } else {
+            var where = {
+                unique: unique,
+                website: website
+            };
+        }
+        website_scrap_data.findOneAndUpdate(where, {$inc: {count_likes: 1}}, function (err, product1) {
             if (err) {
                 res.json({error: 1, message: err, data: []});
+            } else if (!product1) {
+                res.json({error: 1, message: 'not found', data: []});
             } else {
                 res.json({error: 0, message: 'success', data: {count_likes: product1.toJSON().count_likes}});
             }
         });
     } else {
-        res.json({error: 1, message: 'product_id cannot be empty', data: []});
+        res.json({error: 1, message: 'product_id or unique and website cannot be empty', data: []});
     }
 });
 
 router.post('/unlike', function (req, res) {
     var body = req.body;
     var product_id = body.product_id;
+    var unique = body.unique;
+    var website = body.website;
     var website_scrap_data = req.conn_website_scrap_data;
-    if (product_id) {
-        website_scrap_data.findOneAndUpdate({_id: product_id}, {$inc: {count_likes: -1}}, function (err, product1) {
+    if (product_id || unique && website) {
+        if (product_id) {
+            var where = {
+                '_id': mongoose.Types.ObjectId(product_id)
+            };
+        } else {
+            var where = {
+                unique: unique,
+                website: website
+            };
+        }
+        website_scrap_data.findOneAndUpdate(where, {$inc: {count_likes: -1}}, function (err, product1) {
             if (err) {
                 res.json({error: 1, message: err, data: []});
+            } else if (!product1) {
+                res.json({error: 1, message: 'not found', data: []});
             } else {
                 res.json({error: 0, message: 'success', data: {count_likes: product1.toJSON().count_likes}});
             }
         });
     } else {
-        res.json({error: 1, message: 'product_id cannot be empty', data: []});
+        res.json({error: 1, message: 'product_id or unique and website cannot be empty', data: []});
     }
 });
 
