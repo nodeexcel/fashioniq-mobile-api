@@ -321,7 +321,7 @@ router.post('/unlike', function (req, res) {
     var product_id = body.product_id;
     var website_scrap_data = req.conn_website_scrap_data;
     if (product_id) {
-        website_scrap_data.findOneAndUpdate({_id: product_id}, {$inc: {count_unlikes: -1}}, function (err, product1) {
+        website_scrap_data.findOneAndUpdate({_id: product_id}, {$inc: {count_unlikes: 1}}, function (err, product1) {
             if (err) {
                 res.json({error: 1, message: err, data: []});
             } else {
