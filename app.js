@@ -21,8 +21,9 @@ var module_webp = require('./modules/webp');
 var cache = require('./modules/cache');
 
 var v2_routes_catalog = require('./routes/v2/catalog');  //shekhar :: ist step
+var v2_routes_account = require('./routes/v2/account');
 // var v1_routes_catalog = require('./routes/v1/catalog'); // arun :: 1st step
-var v1_routes_account = require('./routes/v1/account');
+// var v1_routes_account = require('./routes/v1/account');
 var v1_routes_wishlist = require('./routes/v1/wishlist');
 // var v1_routes_product = require('./routes/v1/product');
 var v2_routes_product= require('./routes/v2/product');
@@ -128,7 +129,7 @@ app.use(function (req, res, next) {
 // work accroding to version basis 
 
 // app.use('/v1/catalog', v1_routes_catalog);
-app.use('/v1/account', v1_routes_account);
+// app.use('/v1/account', v1_routes_account);
 app.use('/v1/wishlist', v1_routes_wishlist);
 // app.use('/v1/product', v1_routes_product);
 app.use('/v1/feedback', v1_routes_feedback);
@@ -139,7 +140,7 @@ app.use('/v1/picture', require('./routes/v1/picture'));
 app.use('/v1/parseurl', v1_routes_parseurl);
 app.use('/v1/feeds', require('./routes/v1/feeds'));
 app.use('/v1/notify', v1_routes_notify);
-
+app.use('/v2/account', v2_routes_account);
 app.use('/v2/catalog', v2_routes_catalog);
 app.use('/v2/product', v2_routes_product);
 app.use('/v2/parseurl', v2_routes_parseurl);
