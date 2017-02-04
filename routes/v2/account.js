@@ -27,6 +27,7 @@ router.all('/user_info', function (req, res, next) {
         });
     }
 });
+
 router.all('/update/facebook_image', function (req, res, next) {
     var body = req.body;
     var user_id = body.user_id;
@@ -68,14 +69,12 @@ router.all('/update/facebook_image', function (req, res, next) {
             message: 'Invalid Request'
         });
     }
-
 });
 
 router.all('/update/status', function (req, res, next) {
     var body = req.body;
     var user_id = body.user_id;
     var status = body.status;
-
     var UserModel = req.User;
     if (user_id) {
         if (status) {
@@ -106,12 +105,11 @@ router.all('/update/status', function (req, res, next) {
             message: 'Invalid Request'
         });
     }
-
 });
+
 router.all('/update', function (req, res, next) {
     var body = req.body;
     var user_id = body.user_id;
-
     var profile = body.profile;
     var password = body.password;
     var UserModel = req.User;
@@ -162,8 +160,8 @@ router.all('/update', function (req, res, next) {
             message: 'Invalid Request'
         });
     }
-
 });
+
 router.all('/remove_picture', function (req, res, next) {
     var body = req.body;
     var user_id = body.user_id;
@@ -191,14 +189,13 @@ router.all('/remove_picture', function (req, res, next) {
         });
     }
 });
+
 router.all('/picture/view/:filename', function (req, res, next) {
     var filename = req.param('filename');
     console.log(filename + 'filename');
     if (filename) {
         var gfs = req.gfs;
-
         gfs.files.find({filename: filename}).toArray(function (err, files) {
-
             if (err) {
                 next(err);
             }
@@ -213,7 +210,6 @@ router.all('/picture/view/:filename', function (req, res, next) {
                 res.json('File Not Found');
             }
         });
-
     } else {
         res.sendStatus(500);
     }
@@ -223,7 +219,6 @@ router.all('/update/picture', function (req, res, next) {
     var body = req.body;
     var user_id = body.user_id;
     var picture = body.picture;
-
     if (picture && user_id) {
         var UserModel = req.User;
         UserModel.update({
@@ -248,6 +243,7 @@ router.all('/update/picture', function (req, res, next) {
         });
     }
 });
+
 function createDefaultWishlist(user, req, next) {
     var Wishlist = req.Wishlist;
     var wishlist = new Wishlist({
@@ -263,8 +259,6 @@ function createDefaultWishlist(user, req, next) {
         if (err) {
             next(err);
         } else {
-
-
             var wishlist = new Wishlist({
                 name: 'Private',
                 description: '',
@@ -281,10 +275,10 @@ function createDefaultWishlist(user, req, next) {
                     next(false);
                 }
             });
-
         }
     });
 }
+
 function addAuth(user, device, req, res, next) {
     var auth_strategy = req.auth_strategy;
     auth_strategy.createAuth(user.id, device, req, function (err, data) {
@@ -300,10 +294,10 @@ function addAuth(user, device, req, res, next) {
         }
     });
 }
+
 router.all('/create/facebook', function (req, res, next) {
     var body = req.body;
     var user = body.user;
-
     if (!user) {
         res.json({
             error: 1,
@@ -313,7 +307,6 @@ router.all('/create/facebook', function (req, res, next) {
     }
 
     var generatePassword = require('password-generator');
-
     var email = user.email;
     var password = '';
     var name = user.name;
@@ -326,9 +319,7 @@ router.all('/create/facebook', function (req, res, next) {
         var device = user.device;
         var name = user.name;
         var UserModel = req.User;
-
         var userObj = user;
-
         UserModel.findOne({
             email: email
         }).exec(function (err, user) {
@@ -345,7 +336,6 @@ router.all('/create/facebook', function (req, res, next) {
                     }
                     if (user.get('fb_id') * 1 != -1) {
                         if (userObj.fb_id == user.get('fb_id')) {
-
                         } else {
                             res.json({
                                 error: 1,
@@ -354,7 +344,6 @@ router.all('/create/facebook', function (req, res, next) {
                             return;
                         }
                     } else {
-
                         UserModel.update({
                             _id: user.get('_id')
                         }, {
@@ -362,9 +351,7 @@ router.all('/create/facebook', function (req, res, next) {
                                 fb_id: userObj.fb_id
                             }
                         }, function (err) {
-
                         });
-
                     }
                     var user = {
                         id: user.get('_id'),
@@ -391,7 +378,7 @@ router.all('/create/facebook', function (req, res, next) {
                     userObj.password = pass_md5;
                     userObj.google_id = -1;
 
-                    //send new account email with email/pass
+//send new account email with email/pass
                     var model = new UserModel(userObj);
                     model.save(function (err) {
                         if (err) {
@@ -413,12 +400,9 @@ router.all('/create/facebook', function (req, res, next) {
                             });
                         }
                     });
-
                 }
-
             }
         });
-
     } else {
         res.json({
             error: 1,
@@ -427,11 +411,9 @@ router.all('/create/facebook', function (req, res, next) {
     }
 })
 
-
 router.all('/create/google', function (req, res, next) {
     var body = req.body;
     var user = body.user;
-
     if (!user) {
         res.json({
             error: 1,
@@ -441,13 +423,10 @@ router.all('/create/google', function (req, res, next) {
     }
     var name = user.name;
     var generatePassword = require('password-generator');
-
     var email = user.email;
     var password = '';
     var UserModel = req.User;
-
     var userObj = user;
-
     if (user.google_id && name && name.length > 0 && email && email.length > 0) {
         var name = user.name;
         var type = 'google';
@@ -464,7 +443,6 @@ router.all('/create/google', function (req, res, next) {
                 if (user) {
                     if (user.get('google_id') * 1 != -1) {
                         if (userObj.google_id == user.get('google_id')) {
-
                         } else {
                             res.json({
                                 error: 1,
@@ -480,7 +458,6 @@ router.all('/create/google', function (req, res, next) {
                             }
                         }, function (err) {
                         });
-
                     }
                     var user = {
                         id: user.get('_id'),
@@ -499,8 +476,6 @@ router.all('/create/google', function (req, res, next) {
                             });
                         }
                     });
-
-
                 } else {
                     var crypto = require('crypto');
                     var md5 = crypto.createHash('md5');
@@ -508,8 +483,7 @@ router.all('/create/google', function (req, res, next) {
                     var pass_md5 = md5.digest('hex');
                     userObj.password = pass_md5;
                     userObj.fb_id = -1;
-
-                    //send new account email with email/pass
+//send new account email with email/pass
                     var model = new UserModel(userObj);
                     model.save(function (err) {
                         if (err) {
@@ -531,12 +505,9 @@ router.all('/create/google', function (req, res, next) {
                             });
                         }
                     });
-
                 }
-
             }
         });
-
     } else {
         res.json({
             error: 1,
@@ -548,7 +519,6 @@ router.all('/create/google', function (req, res, next) {
 router.all('/create', function (req, res, next) {
     var body = req.body;
     var user = body.user;
-
     if (!user) {
         res.json({
             error: 1,
@@ -556,7 +526,6 @@ router.all('/create', function (req, res, next) {
         });
         return;
     }
-
     var email = user.email;
     var password = '';
     var type = 'signup';
@@ -565,10 +534,8 @@ router.all('/create', function (req, res, next) {
     user.type = type;
     var name = user.name;
     var UserModel = req.User;
-
     user.picture = 'http://' + req.get('host') + '/images/dummy.png';
     var userObj = user;
-
     if (name && name.length > 0 && password && password.length > 0 && email && email.length > 0) {
         UserModel.findOne({
             email: email
@@ -582,8 +549,6 @@ router.all('/create', function (req, res, next) {
                         message: 'Account Already Exists!'
                     });
                 } else {
-
-
                     var crypto = require('crypto');
                     var md5 = crypto.createHash('md5');
                     md5.update(password);
@@ -591,8 +556,7 @@ router.all('/create', function (req, res, next) {
                     userObj.password = pass_md5;
                     userObj.fb_id = -1;
                     userObj.google_id = -1;
-
-                    //send new account email with email/pass
+//send new account email with email/pass
                     var model = new UserModel(userObj);
                     model.save(function (err) {
                         if (err) {
@@ -614,12 +578,9 @@ router.all('/create', function (req, res, next) {
                             });
                         }
                     });
-
                 }
-
             }
         });
-
     } else {
         res.json({
             error: 1,
@@ -631,7 +592,6 @@ router.all('/create', function (req, res, next) {
 router.all('/logout', function (req, res, next) {
     var body = req.body;
     var api_key = body.api_key;
-
     if (api_key) {
         var auth_strategy = req.auth_strategy;
         auth_strategy.removeAuth(api_key, req, res, next);
@@ -644,10 +604,8 @@ router.all('/logout', function (req, res, next) {
 })
 
 router.all('/login', function (req, res, next) {
-
     var body = req.body;
     var user = body.user;
-
     if (!user) {
         res.json({
             error: 1,
@@ -655,16 +613,12 @@ router.all('/login', function (req, res, next) {
         });
         return;
     }
-
-
     var email = user.email;
     var password = '';
     password = user.password;
     var device = user.device;
     var UserModel = req.User;
-
     var userObj = user;
-
     if (password && password.length > 0 && email && email.length > 0) {
         UserModel.findOne({
             email: email
@@ -701,12 +655,9 @@ router.all('/login', function (req, res, next) {
                         error: 1,
                         message: 'Email ID Doesn\'t Exist'
                     });
-
                 }
-
             }
         });
-
     } else {
         res.json({
             error: 1,
@@ -718,9 +669,7 @@ router.all('/login', function (req, res, next) {
 router.all('/forgot_password', function (req, res, next) {
     var body = req.body;
     var email = body.email;
-    //email = 'arun@excellencetechnologies.in';
     var UserModel = req.User;
-
     if (email.length > 0) {
         UserModel.findOne({
             email: email
@@ -770,7 +719,6 @@ router.all('/forgot_password', function (req, res, next) {
             message: 'No Email Set',
         });
     }
-    console.log(email);
 });
 
 module.exports = router;
