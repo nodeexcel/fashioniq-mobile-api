@@ -301,6 +301,7 @@ function addAuth(user, device, req, res, next) {
     });
 }
 router.all('/create/facebook', function (req, res, next) {
+        console.log('++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
     var body = req.body;
     var user = body.user;
 
