@@ -134,7 +134,7 @@ app.use('/v1/wishlist', v1_routes_wishlist);
 // app.use('/v1/product', v1_routes_product);
 app.use('/v1/feedback', v1_routes_feedback);
 app.use('/v1/friends', require('./routes/v1/invite'));
-app.use('/v1/social', require('./routes/v1/social'));
+app.use('/v2/social', require('./routes/v2/social'));
 app.use('/v1/picture', require('./routes/v1/picture'));
 //app.use('/products',routes_catalog); //arun :: 2nd step
 app.use('/v1/parseurl', v1_routes_parseurl);

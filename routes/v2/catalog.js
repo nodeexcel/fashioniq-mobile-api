@@ -108,18 +108,16 @@ router.all('/filters', function (req, res, next) {
         } else {
             var finalData = {};
             finalData.filters = {};
-
-
             var sortBy_arr = new Array;
             sortBy_arr.push({'text': 'Popular', 'param': 'popular', 'sort': {'sort_score': 1}});
             sortBy_arr.push({'text': 'New Arrivals', 'param': 'new', 'sort': {'is_new_insert': -1, 'time': -1}});
             sortBy_arr.push({'text': 'Price -- Low to High', 'param': 'pricelth', 'sort': {'price': 1}});
             sortBy_arr.push({'text': 'Price -- High to Low', 'param': 'pricehtl', 'sort': {'price': -1}});
-            //sortBy_arr.push({'text': 'Off % -- Low to High','param': 'offlth','sort': {'offrate': 1}});
-            //sortBy_arr.push({'text': 'Off % -- High to Low','param': 'offhtl','sort': {'offrate': -1}});
+//sortBy_arr.push({'text': 'Off % -- Low to High','param': 'offlth','sort': {'offrate': 1}});
+//sortBy_arr.push({'text': 'Off % -- High to Low','param': 'offhtl','sort': {'offrate': -1}});
             sortBy_arr.push({'text': 'Price Change', 'param': 'pricechange', 'sort': {'price_diff': -1}});
             if (is_search_filter == false) {
-                // if search page no need of sort
+// if search page no need of sort
                 finalData.sort = sortBy_arr; //filter
             }
             var father_wise_listing = req.recycle_data.father_wise_listing;
@@ -134,7 +132,7 @@ router.all('/filters', function (req, res, next) {
                                 $p_cat_data = father_wise_listing[i].data[k];
                                 $p_cat_data.text = father_wise_listing[i].data[k].name;
                                 if (father_wise_listing[i].data[k].sub_cat_id != -1 && father_wise_listing[i].data[k].sub_cat_id != 1) {
-                                    // for watches and sunglasses
+// for watches and sunglasses
                                     $p_cat_data.param = 'filter__integer__sub_cat_id__' + father_wise_listing[i].data[k].sub_cat_id;
                                 } else {
                                     $p_cat_data.param = 'filter__integer__cat_id__' + father_wise_listing[i].data[k].cat_id;
@@ -233,7 +231,6 @@ router.all('/products', function (req, res, next) {
     var sort = req.body.sort;
     var where_sort;
     var where;
-
     if (!page || !isNaN(page) == false || page <= 0) {
         page = 1;
     }
@@ -255,7 +252,6 @@ router.all('/products', function (req, res, next) {
             }
         });
     }
-    
     website_list.find(where).sort(where_sort).skip((page - 1) * limit).limit(limit).exec(function (err, results) {
         if (err) {
             res.json({error: 1, message: err, data: {'products': []}});
@@ -300,7 +296,6 @@ router.all('/search', function (req, res) {
                             obj.count_products = data.count_products;
                             websites.push(obj);
                         })
-
                         res.json({error: 0, message: 'success', data: {'products': results, 'websites': websites, nextPage: Number(page) + 1, previousPage: Number(page) - 1, searchText: search_text}});
                     }
                 });
