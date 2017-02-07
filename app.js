@@ -20,18 +20,23 @@ var module_product = require('./modules/product');
 var module_webp = require('./modules/webp');
 var cache = require('./modules/cache');
 
-var v2_routes_catalog = require('./routes/v2/catalog');  //shekhar :: ist step
-var v2_routes_account = require('./routes/v2/account');
+
 // var v1_routes_catalog = require('./routes/v1/catalog'); // arun :: 1st step
 // var v1_routes_account = require('./routes/v1/account');
-var v1_routes_wishlist = require('./routes/v1/wishlist');
+// var v1_routes_wishlist = require('./routes/v1/wishlist');
 // var v1_routes_product = require('./routes/v1/product');
-var v2_routes_product= require('./routes/v2/product');
-var v1_routes_feedback = require('./routes/v1/feedback');
-var v1_routes_parseurl = require('./routes/v1/parseurl');
-var v2_routes_parseurl = require('./routes/v2/parseurl');
+// var v1_routes_feedback = require('./routes/v1/feedback');
+// var v1_routes_parseurl = require('./routes/v1/parseurl');
+// var v1_routes_notify = require('./routes/v1/notify');
 
-var v1_routes_notify = require('./routes/v1/notify');
+var v2_routes_catalog = require('./routes/v2/catalog');  //shekhar :: ist step
+var v2_routes_account = require('./routes/v2/account');
+var v2_routes_wishlist = require('./routes/v2/wishlist');
+var v2_routes_product= require('./routes/v2/product');
+var v2_routes_feedback = require('./routes/v2/feedback');
+var v2_routes_parseurl = require('./routes/v2/parseurl');
+var v2_routes_notify = require('./routes/v2/notify');
+
 
 var app = express();
 app.use(useragent.express());
@@ -130,20 +135,25 @@ app.use(function (req, res, next) {
 
 // app.use('/v1/catalog', v1_routes_catalog);
 // app.use('/v1/account', v1_routes_account);
-app.use('/v1/wishlist', v1_routes_wishlist);
+// app.use('/v1/wishlist', v1_routes_wishlist);
 // app.use('/v1/product', v1_routes_product);
-app.use('/v1/feedback', v1_routes_feedback);
-app.use('/v1/friends', require('./routes/v1/invite'));
-app.use('/v2/social', require('./routes/v2/social'));
-app.use('/v1/picture', require('./routes/v1/picture'));
+// app.use('/v1/feedback', v1_routes_feedback);
+// app.use('/v1/friends', require('./routes/v1/invite'));
+// app.use('/v1/picture', require('./routes/v1/picture'));
 //app.use('/products',routes_catalog); //arun :: 2nd step
-app.use('/v1/parseurl', v1_routes_parseurl);
-app.use('/v1/feeds', require('./routes/v1/feeds'));
-app.use('/v1/notify', v1_routes_notify);
+// app.use('/v1/parseurl', v1_routes_parseurl);
+// app.use('/v1/feeds', require('./routes/v1/feeds'));
+app.use('/v2/picture', require('./routes/v2/picture'));
+app.use('/v2/friends', require('./routes/v2/invite'));
+app.use('/v2/feedback', v2_routes_feedback);
+app.use('/v2/wishlist', v2_routes_wishlist);
+app.use('/v2/notify', v2_routes_notify);
+app.use('/v2/feeds', require('./routes/v2/feeds'));
 app.use('/v2/account', v2_routes_account);
 app.use('/v2/catalog', v2_routes_catalog);
 app.use('/v2/product', v2_routes_product);
 app.use('/v2/parseurl', v2_routes_parseurl);
+app.use('/v2/social', require('./routes/v2/social'));
 
 //setting data into cache
 app.use(cache());
