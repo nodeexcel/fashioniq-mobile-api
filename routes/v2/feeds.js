@@ -135,86 +135,98 @@ function checkTrendingFeedData(req, done, next) {
     });
 }
 
+// function getTrendingData(page, req, next, done, recursion) {
+//     var redis = req.redis;
+//     var WishlistItem = req.WishlistItem;
+//     redis.zrevrangebyscore(['home_trending', '+inf', '-inf', 'WITHSCORES', 'LIMIT', page * 10, 10], function (err, response) {
+//         if (err) {
+//             console.log('307');
+//             console.log(err);
+//             next(err);
+//         } else {
+//             if (response.length === 0) {
+//                 console.log('no trending data, fetch from mongo');
+//                 //fetch from mongo is done via cron now
+//             } else {
+//                 //done([]);
+
+
+//                 console.log('309');
+//                 console.log(response);
+//                 var new_array = {};
+//                 var total = 0;
+//                 for (var i = 0; i < response.length; i++) {
+//                     if (i % 2 === 0 && response[i + 1]) {
+//                         new_array[response[i]] = response[i + 1];
+//                         total++;
+//                     }
+//                 }
+
+//                 var k = 0;
+//                 var ret = [];
+//                 var i = 0;
+//                 for (var key in new_array) {
+//                     var value = new_array[key];
+//                     (function (value, key, i) {
+//                         WishlistItem.findOne({
+//                             _id: mongoose.Types.ObjectId(key)
+//                         }).lean().exec(function (err, row) {
+//                             if (row) {
+//                                 row.score = value;
+//                                 row.image = row.img;
+//                                 req.user_helper.getUserDetail(row.original.user_id, req, function (err, user_detail) {
+//                                     if (!err) {
+//                                         row.user = {
+//                                             name: user_detail.name,
+//                                             picture: user_detail.picture
+//                                         };
+//                                     }
+//                                     req.list_helper.getListDetail(row.original.list_id, req, function (err, list_detail) {
+//                                         if (!err) {
+//                                             row.list = {
+//                                                 name: list_detail.name
+//                                             };
+//                                         }
+//                                         ret[i] = row;
+//                                         //ret.push(row);
+//                                         if (k === (total - 1)) {
+//                                             done(ret);
+//                                         }
+//                                         k++;
+//                                     });
+//                                 });
+//                             } else {
+//                                 ret[i] = false;
+//                                 if (k === (total - 1)) {
+//                                     done(ret);
+//                                 }
+//                                 k++;
+//                             }
+//                         });
+//                     })(value, key, i);
+//                     i++;
+//                 }
+//             }
+//         }
+//     });
+// }
 function getTrendingData(page, req, next, done, recursion) {
     var redis = req.redis;
     var WishlistItem = req.WishlistItem;
-    redis.zrevrangebyscore(['home_trending', '+inf', '-inf', 'WITHSCORES', 'LIMIT', page * 10, 10], function (err, response) {
+    var limit = 10;
+    WishlistItem.find({}).sort('-1').skip((page - 1) * limit).limit(limit).exec(function (err, row) {
         if (err) {
-            console.log('307');
-            console.log(err);
-            next(err);
+            done([]);
         } else {
-            if (response.length === 0) {
-                console.log('no trending data, fetch from mongo');
-                //fetch from mongo is done via cron now
-            } else {
-                //done([]);
-
-
-                console.log('309');
-                console.log(response);
-                var new_array = {};
-                var total = 0;
-                for (var i = 0; i < response.length; i++) {
-                    if (i % 2 === 0 && response[i + 1]) {
-                        new_array[response[i]] = response[i + 1];
-                        total++;
-                    }
-                }
-
-                var k = 0;
-                var ret = [];
-                var i = 0;
-                for (var key in new_array) {
-                    var value = new_array[key];
-                    (function (value, key, i) {
-                        WishlistItem.findOne({
-                            _id: mongoose.Types.ObjectId(key)
-                        }).lean().exec(function (err, row) {
-                            if (row) {
-                                row.score = value;
-                                row.image = row.img;
-                                req.user_helper.getUserDetail(row.original.user_id, req, function (err, user_detail) {
-                                    if (!err) {
-                                        row.user = {
-                                            name: user_detail.name,
-                                            picture: user_detail.picture
-                                        };
-                                    }
-                                    req.list_helper.getListDetail(row.original.list_id, req, function (err, list_detail) {
-                                        if (!err) {
-                                            row.list = {
-                                                name: list_detail.name
-                                            };
-                                        }
-                                        ret[i] = row;
-                                        //ret.push(row);
-                                        if (k === (total - 1)) {
-                                            done(ret);
-                                        }
-                                        k++;
-                                    });
-                                });
-                            } else {
-                                ret[i] = false;
-                                if (k === (total - 1)) {
-                                    done(ret);
-                                }
-                                k++;
-                            }
-                        });
-                    })(value, key, i);
-                    i++;
-                }
-            }
+            done(row);
         }
     });
 }
 
 router.all('/trending', function (req, res, next) {
     var page = req.body.page;
-    if (!page) {
-        page = 0;
+    if (!page || !isNaN(page) == false || page <= 0) {
+        page = 1;
     }
     console.log('page' + page);
     getTrendingData(page, req, next, function (data) {
@@ -1187,11 +1199,16 @@ router.all('/stats', function (req, res, next) {
     var current_hour = moment().tz("Asia/Kolkata").format('HH');
     var redis = req.redis;
     var msg = '';
+    console.log('11111111111111111')
     redis.exists('home_trending_generate', function (err, res) {
+        console.log('222222222222222222')
         if (err) {
             msg += 'home trending error';
+            console.log('+++++++++++++=')
         }
+        console.log('333333333333333333333')
         if (res === 0) {
+            console.log('44444444444')
             msg += 'generating home trending data';
             checkTrendingFeedData(req, function () {
                 redis.set('home_trending_generate', 1);
@@ -1199,50 +1216,53 @@ router.all('/stats', function (req, res, next) {
                 redis.expire('home_trending_generate', 60);
             }, next);
         } else {
+            console.log('555555555555')
             msg += 'home trending data already there';
         }
     });
-    redis.exists('home_latest_generate', function (err, res) {
-        if (err) {
-            msg += 'home latest err';
-            console.log(err);
-        }
-        if (res === 0) {
-            msg += 'updating home latest';
-            updateLatestFeedData(req, function () {
-            }, next);
-        } else {
-            msg += 'not updateing home latest';
-        }
-    });
+    // redis.exists('home_latest_generate', function (err, res) {
+    //     console.log('33333333333333333333333333333333')
+    //     if (err) {
+    //         msg += 'home latest err';
+    //         console.log(err);
+    //     }
+    //     if (res === 0) {
+    //         msg += 'updating home latest';
+    //         updateLatestFeedData(req, function () {
+    //         }, next);
+    //     } else {
+    //         msg += 'not updateing home latest';
+    //     }
+    // });
     console.log(current_hour);
-    if (current_hour > 1) {
-        //night 1am
+    // if (current_hour > 1) {
+    //     console.log('4444444444444444444444')
+    //     //night 1am
 
-        deleteUnusedImage(req, current_hour, function () {
+    //     // deleteUnusedImage(req, current_hour, function () {
 
-        });
-        deleteLatestItems(req, function () {
+    //     // });
+    //     // deleteLatestItems(req, function () {
 
-        });
-        processCalc('top_users', req, res, next, function (res0) {
-            processCalc('top_lists', req, res, next, function (res1) {
-                res.json({
-                    error: 0,
-                    data: {
-                        top_users: res0,
-                        top_lists: res1,
-                        msg: msg
-                    }
-                });
-            });
-        });
-    } else {
-        res.json({
-            error: 1,
-            data: current_date + " " + current_hour
-        });
-    }
+    //     // });
+    //     processCalc('top_users', req, res, next, function (res0) {
+    //         processCalc('top_lists', req, res, next, function (res1) {
+    //             res.json({
+    //                 error: 0,
+    //                 data: {
+    //                     top_users: res0,
+    //                     top_lists: res1,
+    //                     msg: msg
+    //                 }
+    //             });
+    //         });
+    //     });
+    // } else {
+    //     res.json({
+    //         error: 1,
+    //         data: current_date + " " + current_hour
+    //     });
+    // }
 });
 function calculateTopLists(req, limit, skip, done) {
     console.log('generating new data for top lists');
