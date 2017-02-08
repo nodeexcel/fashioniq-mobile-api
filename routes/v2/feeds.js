@@ -154,15 +154,17 @@ function getTrendingData(page, req, next, done, recursion) {
                 })(response[i]);
 
             }
+            console.log(new_array)
 var k = 0;
                 var ret = [];
                 var i = 0;
                 for(j=0;j<new_array.length;j++){
              WishlistItem.findOne({
-                            _id: new_array[i]
+                            _id: new_array[j]
                         }).lean().exec(function (err, row) {
+                            console.log(row)
                                if (row) {
-                                console.log(row)
+                                // console.log(row)
                                 // row.score = value;
                                 // row.image = row.img;
                                 req.user_helper.getUserDetail(row.original.user_id, req, function (err, user_detail) {
@@ -183,7 +185,7 @@ var k = 0;
                                             };
                                         }
                                         // console.log(list_detail)
-                                        ret[i] = row;
+                                        ret[j] = row;
                                         ret.push(row);
                                         if (k === (new_array.length - 1)) {
                                             done(ret);
@@ -192,7 +194,7 @@ var k = 0;
                                     });
                                 });
                             } else {
-                                ret[i] = false;
+                                ret[j] = false;
                                 if (k === (new_array.length - 1)) {
                                     done(ret);
                                 }
