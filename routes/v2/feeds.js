@@ -1199,16 +1199,11 @@ router.all('/stats', function (req, res, next) {
     var current_hour = moment().tz("Asia/Kolkata").format('HH');
     var redis = req.redis;
     var msg = '';
-    console.log('11111111111111111')
     redis.exists('home_trending_generate', function (err, res) {
-        console.log('222222222222222222')
         if (err) {
             msg += 'home trending error';
-            console.log('+++++++++++++=')
         }
-        console.log('333333333333333333333')
         if (res === 0) {
-            console.log('44444444444')
             msg += 'generating home trending data';
             checkTrendingFeedData(req, function () {
                 redis.set('home_trending_generate', 1);
@@ -1216,53 +1211,50 @@ router.all('/stats', function (req, res, next) {
                 redis.expire('home_trending_generate', 60);
             }, next);
         } else {
-            console.log('555555555555')
             msg += 'home trending data already there';
         }
     });
-    // redis.exists('home_latest_generate', function (err, res) {
-    //     console.log('33333333333333333333333333333333')
-    //     if (err) {
-    //         msg += 'home latest err';
-    //         console.log(err);
-    //     }
-    //     if (res === 0) {
-    //         msg += 'updating home latest';
-    //         updateLatestFeedData(req, function () {
-    //         }, next);
-    //     } else {
-    //         msg += 'not updateing home latest';
-    //     }
-    // });
+    redis.exists('home_latest_generate', function (err, res) {
+        if (err) {
+            msg += 'home latest err';
+            console.log(err);
+        }
+        if (res === 0) {
+            msg += 'updating home latest';
+            updateLatestFeedData(req, function () {
+            }, next);
+        } else {
+            msg += 'not updateing home latest';
+        }
+    });
     console.log(current_hour);
-    // if (current_hour > 1) {
-    //     console.log('4444444444444444444444')
-    //     //night 1am
+    if (current_hour > 1) {
+        //night 1am
 
-    //     // deleteUnusedImage(req, current_hour, function () {
+        deleteUnusedImage(req, current_hour, function () {
 
-    //     // });
-    //     // deleteLatestItems(req, function () {
+        });
+        deleteLatestItems(req, function () {
 
-    //     // });
-    //     processCalc('top_users', req, res, next, function (res0) {
-    //         processCalc('top_lists', req, res, next, function (res1) {
-    //             res.json({
-    //                 error: 0,
-    //                 data: {
-    //                     top_users: res0,
-    //                     top_lists: res1,
-    //                     msg: msg
-    //                 }
-    //             });
-    //         });
-    //     });
-    // } else {
-    //     res.json({
-    //         error: 1,
-    //         data: current_date + " " + current_hour
-    //     });
-    // }
+        });
+        processCalc('top_users', req, res, next, function (res0) {
+            processCalc('top_lists', req, res, next, function (res1) {
+                res.json({
+                    error: 0,
+                    data: {
+                        top_users: res0,
+                        top_lists: res1,
+                        msg: msg
+                    }
+                });
+            });
+        });
+    } else {
+        res.json({
+            error: 1,
+            data: current_date + " " + current_hour
+        });
+    }
 });
 function calculateTopLists(req, limit, skip, done) {
     console.log('generating new data for top lists');
