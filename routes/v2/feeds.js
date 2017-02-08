@@ -135,93 +135,152 @@ function checkTrendingFeedData(req, done, next) {
     });
 }
 
-// function getTrendingData(page, req, next, done, recursion) {
-//     var redis = req.redis;
-//     var WishlistItem = req.WishlistItem;
-//     redis.zrevrangebyscore(['home_trending', '+inf', '-inf', 'WITHSCORES', 'LIMIT', page * 10, 10], function (err, response) {
-//         if (err) {
-//             console.log('307');
-//             console.log(err);
-//             next(err);
-//         } else {
-//             if (response.length === 0) {
-//                 console.log('no trending data, fetch from mongo');
-//                 //fetch from mongo is done via cron now
-//             } else {
-//                 //done([]);
-
-
-//                 console.log('309');
-//                 console.log(response);
-//                 var new_array = {};
-//                 var total = 0;
-//                 for (var i = 0; i < response.length; i++) {
-//                     if (i % 2 === 0 && response[i + 1]) {
-//                         new_array[response[i]] = response[i + 1];
-//                         total++;
-//                     }
-//                 }
-
-//                 var k = 0;
-//                 var ret = [];
-//                 var i = 0;
-//                 for (var key in new_array) {
-//                     var value = new_array[key];
-//                     (function (value, key, i) {
-//                         WishlistItem.findOne({
-//                             _id: mongoose.Types.ObjectId(key)
-//                         }).lean().exec(function (err, row) {
-//                             if (row) {
-//                                 row.score = value;
-//                                 row.image = row.img;
-//                                 req.user_helper.getUserDetail(row.original.user_id, req, function (err, user_detail) {
-//                                     if (!err) {
-//                                         row.user = {
-//                                             name: user_detail.name,
-//                                             picture: user_detail.picture
-//                                         };
-//                                     }
-//                                     req.list_helper.getListDetail(row.original.list_id, req, function (err, list_detail) {
-//                                         if (!err) {
-//                                             row.list = {
-//                                                 name: list_detail.name
-//                                             };
-//                                         }
-//                                         ret[i] = row;
-//                                         //ret.push(row);
-//                                         if (k === (total - 1)) {
-//                                             done(ret);
-//                                         }
-//                                         k++;
-//                                     });
-//                                 });
-//                             } else {
-//                                 ret[i] = false;
-//                                 if (k === (total - 1)) {
-//                                     done(ret);
-//                                 }
-//                                 k++;
-//                             }
-//                         });
-//                     })(value, key, i);
-//                     i++;
-//                 }
-//             }
-//         }
-//     });
-// }
 function getTrendingData(page, req, next, done, recursion) {
     var redis = req.redis;
     var WishlistItem = req.WishlistItem;
-    var limit = 10;
-    WishlistItem.find({}).sort('-1').skip((page - 1) * limit).limit(limit).exec(function (err, row) {
+    var WishlistItemAssoc = req.WishlistItemAssoc;
+    // redis.zrevrangebyscore(['home_trending', '+inf', '-inf', 'WITHSCORES', 'LIMIT', page * 10, 10], function (err, response) {
+        WishlistItemAssoc.find({},function(err,response){
         if (err) {
-            done([]);
+            console.log('307');
+            console.log(err);
+            next(err);
         } else {
-            done(row);
+            var new_array = [];
+            for(i=0;i<response.length;i++){
+                (function(row){
+                    // console.log(row.item_id)
+                    new_array.push(row.item_id)
+                })(response[i]);
+
+            }
+var k = 0;
+                var ret = [];
+                var i = 0;
+                for(j=0;j<new_array.length;j++){
+             WishlistItem.findOne({
+                            _id: new_array[i]
+                        }).lean().exec(function (err, row) {
+                               if (row) {
+                                console.log(row)
+                                // row.score = value;
+                                // row.image = row.img;
+                                req.user_helper.getUserDetail(row.original.user_id, req, function (err, user_detail) {
+                                    if (!err) {
+                                        row.user = {
+                                            name: user_detail.name,
+                                            picture: user_detail.picture
+                                        };
+                                    }
+                                    console.log(row.original.list_id)
+                                    // console.log(req.list_helper.getListDetail())
+                                    req.list_helper.getListDetail(row.original.list_id, req, function (err, list_detail) {
+                                        // console.log(err)
+                                    
+                                        if (!err) {
+                                            row.list = {
+                                                name: list_detail.name
+                                            };
+                                        }
+                                        // console.log(list_detail)
+                                        ret[i] = row;
+                                        ret.push(row);
+                                        if (k === (new_array.length - 1)) {
+                                            done(ret);
+                                        }
+                                        k++;
+                                    });
+                                });
+                            } else {
+                                ret[i] = false;
+                                if (k === (new_array.length - 1)) {
+                                    done(ret);
+                                }
+                                k++;
+                            }
+                            // console.log(err,row)
+  });
+}
+            // console.log(new_array)
+            // if (response.length === 0) {
+            //     console.log('no trending data, fetch from mongo');
+            //     //fetch from mongo is done via cron now
+            // } else {
+            //     //done([]);
+
+
+            //     console.log('309');
+            //     console.log(response);
+            //     var new_array = {};
+            //     var total = 0;
+            //     for (var i = 0; i < response.length; i++) {
+            //         if (i % 2 === 0 && response[i + 1]) {
+            //             new_array[response[i]] = response[i + 1];
+            //             total++;
+            //         }
+            //     }
+
+            //     var k = 0;
+            //     var ret = [];
+            //     var i = 0;
+            //     for (var key in new_array) {
+            //         var value = new_array[key];
+            //         (function (value, key, i) {
+            //             WishlistItem.findOne({
+            //                 _id: mongoose.Types.ObjectId(key)
+            //             }).lean().exec(function (err, row) {
+            //                 if (row) {
+            //                     row.score = value;
+            //                     row.image = row.img;
+            //                     req.user_helper.getUserDetail(row.original.user_id, req, function (err, user_detail) {
+            //                         if (!err) {
+            //                             row.user = {
+            //                                 name: user_detail.name,
+            //                                 picture: user_detail.picture
+            //                             };
+            //                         }
+            //                         req.list_helper.getListDetail(row.original.list_id, req, function (err, list_detail) {
+            //                             if (!err) {
+            //                                 row.list = {
+            //                                     name: list_detail.name
+            //                                 };
+            //                             }
+            //                             ret[i] = row;
+            //                             //ret.push(row);
+            //                             if (k === (total - 1)) {
+            //                                 done(ret);
+            //                             }
+            //                             k++;
+            //                         });
+            //                     });
+            //                 } else {
+            //                     ret[i] = false;
+            //                     if (k === (total - 1)) {
+            //                         done(ret);
+            //                     }
+            //                     k++;
+            //                 }
+            //             });
+            //         })(value, key, i);
+            //         i++;
+            //     }
+            // }
         }
     });
 }
+// function getTrendingData(page, req, next, done, recursion) {
+//     var redis = req.redis;
+//     var WishlistItem = req.WishlistItem;
+//      var WishlistItemAssoc = req.WishlistItemAssoc;
+//     var limit = 10;
+//     WishlistItemAssoc.find({}).sort('-1').skip((page - 1) * limit).limit(limit).exec(function (err, row) {
+//         if (err) {
+//             done([]);
+//         } else {
+//             done(row);
+//         }
+//     });
+// }
 
 router.all('/trending', function (req, res, next) {
     var page = req.body.page;
