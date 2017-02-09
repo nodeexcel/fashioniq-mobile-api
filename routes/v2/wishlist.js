@@ -553,6 +553,7 @@ router.all('/item/list', function (req, res, next) {
                                                     prod.dimension = wishlist_row.get('dimension');
                                                     prod.name = name;
                                                     prod.image = img;
+                                                    prod.org_img = img;
                                                     prod.website = website;
                                                     prod.type = wishlist_row.get('type');
                                                     prod.created_at = moment(created_at).tz('Asia/Calcutta').format('Do MMM h:mm a');
@@ -592,6 +593,7 @@ router.all('/item/list', function (req, res, next) {
                                                 prod.dimension = wishlist_row.get('dimension');
                                                 prod.name = wishlist_row.get('name');
                                                 prod.image = wishlist_row.get('img');
+                                                prod.org_img = wishlist_row.get('img');;
                                                 prod.description = wishlist_row.get('description');
                                                 prod.type = wishlist_row.get('type');
                                                 var created_at = wishlist_row.get('created_at');
