@@ -154,15 +154,20 @@ function getTrendingData(page, req, next, done, recursion) {
                 })(response[i]);
 
             }
-            console.log(new_array)
 var k = 0;
                 var ret = [];
                 var i = 0;
+                var x= 0;
+                console.log('+++++++++++++++++++++++++++++')
+                console.log(new_array.length)
+                console.log('+++++++++++++++++++++++++++++')
                 for(j=0;j<new_array.length;j++){
              WishlistItem.findOne({
                             _id: new_array[j]
                         }).lean().exec(function (err, row) {
+                            console.log('======================================')
                             console.log(row)
+                            console.log('======================================')
                                if (row) {
                                 // console.log(row)
                                 // row.score = value;
@@ -174,7 +179,7 @@ var k = 0;
                                             picture: user_detail.picture
                                         };
                                     }
-                                    console.log(row.original.list_id)
+                                    // console.log(row.original.list_id)
                                     // console.log(req.list_helper.getListDetail())
                                     req.list_helper.getListDetail(row.original.list_id, req, function (err, list_detail) {
                                         // console.log(err)
@@ -185,8 +190,10 @@ var k = 0;
                                             };
                                         }
                                         // console.log(list_detail)
-                                        ret[j] = row;
+                                        // ret[j] = row;
+                                        console.log('shekhar welcome')
                                         ret.push(row);
+                                        console.log(x++);
                                         if (k === (new_array.length - 1)) {
                                             done(ret);
                                         }
@@ -194,7 +201,8 @@ var k = 0;
                                     });
                                 });
                             } else {
-                                ret[j] = false;
+                                console.log(x++);
+                                // ret[j] = false;
                                 if (k === (new_array.length - 1)) {
                                     done(ret);
                                 }
