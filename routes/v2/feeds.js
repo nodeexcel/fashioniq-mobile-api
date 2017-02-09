@@ -139,13 +139,16 @@ function getTrendingData(page, req, next, done, recursion) {
     var redis = req.redis;
     var WishlistItem = req.WishlistItem;
     var WishlistItemAssoc = req.WishlistItemAssoc;
+    var limit = 10;
     // redis.zrevrangebyscore(['home_trending', '+inf', '-inf', 'WITHSCORES', 'LIMIT', page * 10, 10], function (err, response) {
-        WishlistItemAssoc.find({},function(err,response){
+        // WishlistItemAssoc.find({},function(err,response){
+            WishlistItemAssoc.find({}).sort('-1').skip((page - 1) * limit).limit(limit).exec(function (err, response) {
+                console.log(response)
         if (err) {
             console.log('307');
             console.log(err);
             next(err);
-        } else {
+        } else if(response.length > 0) {
             var new_array = [];
             for(i=0;i<response.length;i++){
                 (function(row){
@@ -275,6 +278,8 @@ var k = 0;
             //         i++;
             //     }
             // }
+        }else{
+            done([]);
         }
     });
 }
