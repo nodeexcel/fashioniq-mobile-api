@@ -139,7 +139,7 @@ function getTrendingData(page, req, next, done, recursion) {
     var WishlistItem = req.WishlistItem;
     var WishlistItemAssoc = req.WishlistItemAssoc;
     var limit = 10;
-    WishlistItemAssoc.find({}).sort('-1').skip((page - 1) * limit).limit(limit).exec(function (err, response) {
+    WishlistItemAssoc.find({}).sort({created_at:-1}).skip((page - 1) * limit).limit(limit).exec(function (err, response) {
         if (err) {
             console.log(err);
             next(err);
