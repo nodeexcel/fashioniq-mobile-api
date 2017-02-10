@@ -139,7 +139,7 @@ function getTrendingData(page, req, next, done, recursion) {
     var WishlistItem = req.WishlistItem;
     var WishlistItemAssoc = req.WishlistItemAssoc;
     var limit = 10;
-    WishlistItemAssoc.find({}).sort({created_at:-1}).skip((page - 1) * limit).limit(limit).exec(function (err, response) {
+    WishlistItemAssoc.find({}).sort('-1').skip((page - 1) * limit).limit(limit).exec(function (err, response) {
         if (err) {
             console.log(err);
             next(err);
@@ -156,7 +156,7 @@ function getTrendingData(page, req, next, done, recursion) {
             for (j = 0; j < new_array.length; j++) {
                 WishlistItem.findOne({
                     _id: new_array[j]
-                }).sort({created_at:-1}).lean().exec(function (err, row) {
+                }).sort('-1').lean().exec(function (err, row) {
                     if (row) {
                         req.user_helper.getUserDetail(row.original.user_id, req, function (err, user_detail) {
                             if (!err) {
