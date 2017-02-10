@@ -156,7 +156,7 @@ function getTrendingData(page, req, next, done, recursion) {
             for (j = 0; j < new_array.length; j++) {
                 WishlistItem.findOne({
                     _id: new_array[j]
-                }).lean().exec(function (err, row) {
+                }).sort({created_at:-1}).lean().exec(function (err, row) {
                     if (row) {
                         req.user_helper.getUserDetail(row.original.user_id, req, function (err, user_detail) {
                             if (!err) {
