@@ -2,6 +2,7 @@ var express = require('express');
 var fs = require('fs');
 var router = express.Router();
 var mongoose = require('mongoose');
+var _ = require('lodash');
 
 router.all('/set_genie_alert', function (req, res, next) {
     var body = req.body;
@@ -21,19 +22,10 @@ router.all('/set_genie_alert', function (req, res, next) {
             } else {
                 product = product[0];
                 var email = product.get('genie_alerts');
-                var j = 0;
-                for (i = 0; i < email.length; i++) {
-                    if (email[i].email_id == email_id) {
-                        res.json({status: 0, message: "you are already subscribed"});
-                        j = 0;
-                        break;
-                    } else {
-                        j = 1;
-                    }
-                }
-                if (j == 1) {
+                var check_email = _.some(email, {"email_id": email_id});
+                if (check_email == false) {
                     if (product.get('genie_alerts')) {
-                        var genie_alerts = product.get('genie_alerts');
+                        var genie_alerts = email;
                     } else {
                         var genie_alerts = [];
                     }
@@ -52,6 +44,8 @@ router.all('/set_genie_alert', function (req, res, next) {
                             res.json({status: 0, message: "Price alert subscribed"});
                         }
                     });
+                } else {
+                    res.json({status: 0, message: "you are already subscribed"});
                 }
             }
         });
