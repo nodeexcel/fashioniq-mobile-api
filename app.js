@@ -36,6 +36,7 @@ var v2_routes_product= require('./routes/v2/product');
 var v2_routes_feedback = require('./routes/v2/feedback');
 var v2_routes_parseurl = require('./routes/v2/parseurl');
 var v2_routes_notify = require('./routes/v2/notify');
+var v2_routes_genie_alerts = require('./routes/v2/genie_alerts');
 
 
 var app = express();
@@ -154,6 +155,7 @@ app.use('/v2/catalog', v2_routes_catalog);
 app.use('/v2/product', v2_routes_product);
 app.use('/v2/parseurl', v2_routes_parseurl);
 app.use('/v2/social', require('./routes/v2/social'));
+app.use('/v2/genie_alerts', v2_routes_genie_alerts);
 
 //setting data into cache
 app.use(cache());
