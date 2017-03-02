@@ -1,9 +1,9 @@
 var mongoose = require('mongoose');
 var redis = require('redis');
-module.exports = function (mongoose) {
+module.exports = function(mongoose) {
 
     var client = redis.createClient();
-    client.on("error", function (err) {
+    client.on("error", function(err) {
         console.log("Error Redis Connection" + err);
         process.exit(0);
     });
@@ -43,6 +43,11 @@ module.exports = function (mongoose) {
         strict: false,
         collection: 'temp_latest'
     });
+    var schema_log_push_notification = mongoose.Schema({}, {
+        strict: false,
+        collection: 'log_push_notification'
+    });
+    var log_push_notification = conn.model('log_push_notification', schema_log_push_notification);
     var temp_latest = conn.model('temp_latest', schema_temp_latest);
     var final_fashion_filters = conn.model('final_fashion_filters', schema_final_fashion_filters);
     var filters_category_wise = conn.model('filters_category_wise', schema_filters_category_wise);
@@ -55,53 +60,53 @@ module.exports = function (mongoose) {
     var wishlistItemType = ['product', 'custom'];
     var Schema = mongoose.Schema;
     var user_schema = mongoose.Schema({
-        name: {type: String, required: true},
-        email: {type: String, required: true, index: {unique: true}},
-        picture: {type: String, required: true},
-        password: {type: String, required: true},
-        status: {type: String, default: ''},
-        gender: {type: String, enum: genderTypes},
-        created_at: {type: Date, default: Date.now},
-        updated_at: {type: Date, default: Date.now},
-        type: {type: String, required: true, enum: allowedConnectinoType},
-        fb_id: {type: String, default: '-1'},
-        google_id: {type: String, default: '-1'},
+        name: { type: String, required: true },
+        email: { type: String, required: true, index: { unique: true } },
+        picture: { type: String, required: true },
+        password: { type: String, required: true },
+        status: { type: String, default: '' },
+        gender: { type: String, enum: genderTypes },
+        created_at: { type: Date, default: Date.now },
+        updated_at: { type: Date, default: Date.now },
+        type: { type: String, required: true, enum: allowedConnectinoType },
+        fb_id: { type: String, default: '-1' },
+        google_id: { type: String, default: '-1' },
         meta: {
-            lists: {type: Number, default: 0},
-            products: {type: Number, default: 0},
-            followers: {type: Number, default: 0}, //will not addup followers from list
-            following: {type: Number, default: 0},
-            score: {type: Number, default: 0}, //user score based on items which is updated daily
-            score_updated: {type: String}
+            lists: { type: Number, default: 0 },
+            products: { type: Number, default: 0 },
+            followers: { type: Number, default: 0 }, //will not addup followers from list
+            following: { type: Number, default: 0 },
+            score: { type: Number, default: 0 }, //user score based on items which is updated daily
+            score_updated: { type: String }
         },
-        friends: [{type: Schema.Types.ObjectId, ref: 'User'}],
-        followers: [{type: Schema.Types.ObjectId, ref: 'User'}],
-//        channel: {type: Mixed}
+        friends: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+        followers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+        //        channel: {type: Mixed}
     });
-    user_schema.index({email: -1}); //schema level
-//    user_schema.set('autoIndex', false);
+    user_schema.index({ email: -1 }); //schema level
+    //    user_schema.set('autoIndex', false);
 
     var wishlist_schema = mongoose.Schema({
-        name: {type: String, require: true},
-        description: {type: String, require: true},
-        user_id: {type: Schema.Types.ObjectId, ref: 'User'},
-        type: {type: String, require: true, enum: wishlistTypes},
-        shared_ids: [{type: Schema.Types.ObjectId, ref: 'User'}],
+        name: { type: String, require: true },
+        description: { type: String, require: true },
+        user_id: { type: Schema.Types.ObjectId, ref: 'User' },
+        type: { type: String, require: true, enum: wishlistTypes },
+        shared_ids: [{ type: Schema.Types.ObjectId, ref: 'User' }],
         meta: {
-            products: {type: Number, default: 0},
-            likes: {type: Number, default: 0}, //there won't be direct likes on this list, so total likes from all products
-            score: {type: Number, default: 0},
-            score_updated: {type: String}
+            products: { type: Number, default: 0 },
+            likes: { type: Number, default: 0 }, //there won't be direct likes on this list, so total likes from all products
+            score: { type: Number, default: 0 },
+            score_updated: { type: String }
         },
-        created_at: {type: Date, default: Date.now},
-        followers: [{type: Schema.Types.ObjectId, ref: 'User'}]
+        created_at: { type: Date, default: Date.now },
+        followers: [{ type: Schema.Types.ObjectId, ref: 'User' }]
     });
-    wishlist_schema.index({user_id: -1});
+    wishlist_schema.index({ user_id: -1 });
     var wishlist_item_schema = mongoose.Schema({
-        name: {type: String},
-//        list_id: {type: Schema.Types.ObjectId, ref: 'Wishlist'},
-//        user_id: {type: Schema.Types.ObjectId, ref: 'User'},
-        image: {type: String, require: true},
+        name: { type: String },
+        //        list_id: {type: Schema.Types.ObjectId, ref: 'Wishlist'},
+        //        user_id: {type: Schema.Types.ObjectId, ref: 'User'},
+        image: { type: String, require: true },
         price: Number,
         href: String,
         img: String,
@@ -112,86 +117,86 @@ module.exports = function (mongoose) {
         sub_cat_id: Number,
         website: String,
         unique: String,
-        location: {type: [Number], index: '2dsphere'},
-        zoom: {type: Number},
-        type: {type: String, required: true, enum: wishlistItemType},
+        location: { type: [Number], index: '2dsphere' },
+        zoom: { type: Number },
+        type: { type: String, required: true, enum: wishlistItemType },
         description: String,
-        created_at: {type: Date, default: Date.now},
-        updated_at: {type: Date, default: Date.now},
-        access_type: {type: String, require: true, enum: wishlistTypes},
+        created_at: { type: Date, default: Date.now },
+        updated_at: { type: Date, default: Date.now },
+        access_type: { type: String, require: true, enum: wishlistTypes },
         original: {
-            user_id: {type: Schema.Types.ObjectId, ref: 'User'}, //id of original user
-            list_id: {type: Schema.Types.ObjectId, ref: 'Wishlist'}, //id of original list
+            user_id: { type: Schema.Types.ObjectId, ref: 'User' }, //id of original user
+            list_id: { type: Schema.Types.ObjectId, ref: 'Wishlist' }, //id of original list
         },
         pins: [{
-                user_id: {type: Schema.Types.ObjectId, ref: 'User'},
-                created_at: {type: Date, default: Date.now}
-            }],
+            user_id: { type: Schema.Types.ObjectId, ref: 'User' },
+            created_at: { type: Date, default: Date.now }
+        }],
         meta: {
-            likes: {type: Number, default: 0}, //total number of likes
-            comments: {type: Number, default: 0}, //total number of comments unique user comments
-            user_points: {type: Number, default: 0}, //original user points
-            list_points: {type: Number, default: 0}  //original list points
+            likes: { type: Number, default: 0 }, //total number of likes
+            comments: { type: Number, default: 0 }, //total number of comments unique user comments
+            user_points: { type: Number, default: 0 }, //original user points
+            list_points: { type: Number, default: 0 } //original list points
         }
     });
     var wishlist_item_assoc_schema = mongoose.Schema({
-        list_id: {type: Schema.Types.ObjectId, ref: 'Wishlist'},
-        item_id: {type: Schema.Types.ObjectId, ref: 'Wishlist_Item'},
+        list_id: { type: Schema.Types.ObjectId, ref: 'Wishlist' },
+        item_id: { type: Schema.Types.ObjectId, ref: 'Wishlist_Item' },
         likes: [{
-                user_id: {type: Schema.Types.ObjectId, ref: 'User'},
-                created_at: {type: Date, default: Date.now}
-            }],
-        comments: [{type: Schema.Types.ObjectId, ref: 'Comment'}],
-        created_at: {type: Date, default: Date.now}
+            user_id: { type: Schema.Types.ObjectId, ref: 'User' },
+            created_at: { type: Date, default: Date.now }
+        }],
+        comments: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],
+        created_at: { type: Date, default: Date.now }
     });
-    wishlist_item_assoc_schema.index({list_id: -1});
-    wishlist_item_assoc_schema.index({item_id: -1});
+    wishlist_item_assoc_schema.index({ list_id: -1 });
+    wishlist_item_assoc_schema.index({ item_id: -1 });
     var item_comment_schema = mongoose.Schema({
-        user_id: {type: Schema.Types.ObjectId, ref: 'User'},
+        user_id: { type: Schema.Types.ObjectId, ref: 'User' },
         comment: String,
         picture: String,
-        created_at: {type: Date, default: Date.now},
+        created_at: { type: Date, default: Date.now },
         likes: [{
-                user_id: {type: Schema.Types.ObjectId, ref: 'User'},
-                created_at: {type: Date, default: Date.now}
-            }]
+            user_id: { type: Schema.Types.ObjectId, ref: 'User' },
+            created_at: { type: Date, default: Date.now }
+        }]
     })
-    item_comment_schema.index({user_id: -1});
+    item_comment_schema.index({ user_id: -1 });
     var wishlist_item_update_schema = mongoose.Schema({
-        user_id: {type: Schema.Types.ObjectId, ref: 'User'},
-        item_id: {type: Schema.Types.ObjectId, ref: 'Wishlist_Item'},
-        created_at: {type: Date, default: Date.now}
+        user_id: { type: Schema.Types.ObjectId, ref: 'User' },
+        item_id: { type: Schema.Types.ObjectId, ref: 'Wishlist_Item' },
+        created_at: { type: Date, default: Date.now }
     });
     var user_item_updates = mongoose.Schema({
-        user_id: {type: Schema.Types.ObjectId, ref: 'User'},
-        item_id: {type: Schema.Types.ObjectId, ref: 'Wishlist_Item'},
-        created_at: {type: Date, default: Date.now}
+        user_id: { type: Schema.Types.ObjectId, ref: 'User' },
+        item_id: { type: Schema.Types.ObjectId, ref: 'Wishlist_Item' },
+        created_at: { type: Date, default: Date.now }
     });
     var user_updates = mongoose.Schema({
-        user_id: {type: Schema.Types.ObjectId, ref: 'User'},
-        type: {type: String, require: true},
-        data: {type: Schema.Types.Mixed},
-        read: {type: Boolean, default: false},
-        gcm_status: {type: Schema.Types.Mixed},
-        created_at: {type: Date, default: Date.now}
+        user_id: { type: Schema.Types.ObjectId, ref: 'User' },
+        type: { type: String, require: true },
+        data: { type: Schema.Types.Mixed },
+        read: { type: Boolean, default: false },
+        gcm_status: { type: Schema.Types.Mixed },
+        created_at: { type: Date, default: Date.now }
     });
     var auth_schema = mongoose.Schema({
-        user_id: {type: String, required: true},
-        api_key: {type: String, required: true},
-        api_secret: {type: String, required: true},
-        created_at: {type: Date, default: Date.now},
-        device: {type: Schema.Types.Mixed}
+        user_id: { type: String, required: true },
+        api_key: { type: String, required: true },
+        api_secret: { type: String, required: true },
+        created_at: { type: Date, default: Date.now },
+        device: { type: Schema.Types.Mixed }
     });
-    auth_schema.index({'api_key': -1});
+    auth_schema.index({ 'api_key': -1 });
     var gcm_schema = mongoose.Schema({
-        user_id: {type: String, required: true},
-        reg_id: {type: String},
-        token: {type: String},
-        created_at: {type: Date, default: Date.now},
-        device: {type: Schema.Types.Mixed}
+        user_id: { type: String, required: true },
+        reg_id: { type: String },
+        token: { type: String },
+        created_at: { type: Date, default: Date.now },
+        device: { type: Schema.Types.Mixed }
     });
-    gcm_schema.index({user_id: -1});
-//    gcm_schema.index({user_id: -1, api_key: -1});
+    gcm_schema.index({ user_id: -1 });
+    //    gcm_schema.index({user_id: -1, api_key: -1});
     var feed_schema = mongoose.Schema({
         image: String,
         original: Schema.Types.Mixed,
@@ -210,13 +215,13 @@ module.exports = function (mongoose) {
         list: Schema.Types.Mixed
     });
     var friend_request_schema = mongoose.Schema({
-        from_user_id: {type: Schema.Types.ObjectId, ref: 'User'},
-        to_user_id: {type: Schema.Types.ObjectId, ref: 'User'},
-        created_at: {type: Date, default: Date.now},
-        updated_at: {type: Date},
+        from_user_id: { type: Schema.Types.ObjectId, ref: 'User' },
+        to_user_id: { type: Schema.Types.ObjectId, ref: 'User' },
+        created_at: { type: Date, default: Date.now },
+        updated_at: { type: Date },
         status: String,
     });
-    auth_schema.index({'from_user_id': -1, 'to_user_id': -1});
+    auth_schema.index({ 'from_user_id': -1, 'to_user_id': -1 });
     var feed = conn.model('feed', feed_schema);
     var GCM = conn.model('GCM', gcm_schema);
     var Auth = conn.model('Auth', auth_schema);
@@ -243,7 +248,7 @@ module.exports = function (mongoose) {
     var Grid = require('gridfs-stream');
     Grid.mongo = mongoose.mongo;
     var gfs = Grid(conn.db);
-    return function (req, res, next) {
+    return function(req, res, next) {
         req.feed = feed;
         req.temp_latest = temp_latest;
         req.scrap_db2 = scrap_db2;
@@ -268,6 +273,7 @@ module.exports = function (mongoose) {
         req.Calculation = Calculation;
         req.user_watch_map = user_watch_map;
         req.redis = client;
+        req.log_push_notification = log_push_notification;
         next();
     }
 }

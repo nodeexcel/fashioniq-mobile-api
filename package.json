@@ -15,6 +15,7 @@
     "express": "~4.9.0",
     "express-handlebars": "~1.1.0",
     "express-useragent": "^0.1.3",
+    "fcm-node": "^1.0.16",
     "gridfs-stream": "~0.5.3",
     "image-size": "^0.3.5",
     "jade": "~1.6.0",
