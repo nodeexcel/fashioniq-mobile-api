@@ -83,7 +83,6 @@ function checkTrendingFeedData(req, done, next) {
                             if (row.value.image.length > 0) {
                                 row.value._id = row._id;
                                 new_result.push(row.value);
-                                //                                console.log(row.value.baseScore);
                             }
                         }
                     }
@@ -196,17 +195,6 @@ function getTrendingData(page, req, next, done, recursion) {
         }
     });
 }
-// function getTrendingData(page, req, next, done, recursion) {
-//      var WishlistItemAssoc = req.WishlistItemAssoc;
-//     var limit = 10;
-//     WishlistItemAssoc.find({}).sort('-1').skip((page - 1) * limit).limit(limit).exec(function (err, row) {
-//         if (err) {
-//             done([]);
-//         } else {
-//             done(row);
-//         }
-//     });
-// }
 
 router.all('/trending', function (req, res, next) {
     var page = req.body.page;
@@ -268,11 +256,6 @@ function updateLatestFeedData(req, done, next) {
                 console.log(err);
                 console.log('line 342');
             } else {
-                //                    redis.del(lt_redis_key, function (err) {
-                //                        if (err) {
-                //                            console.log('line 301')
-                //                        }
-
                 console.log(latest_products.length + "latest products");
                 async.eachLimit(latest_products, 2, function (row, callback) {
                     WishlistItem.findOne({
@@ -460,9 +443,6 @@ function getLatestData(latest_type, page, only_ids, req, next, done, recursion) 
     }
     console.log(new Date(new Date().getTime() - 24 * 7 * 60 * 60 * 1000));
     WishlistItem.find({
-        //        created_at: {
-        //            $gt: new Date(new Date().getTime() - 24 * 7 * 60 * 60 * 1000)
-        //        },
         'original.list_id': list_id
     }).sort({'created_at': -1}).limit(20).skip(page * 20).lean().exec(function (err, response) {
         if (err) {
@@ -516,88 +496,10 @@ function getLatestData(latest_type, page, only_ids, req, next, done, recursion) 
                             });
                         })(response[i], i);
                     }
-                    //                    for (var k = 0; k < total; k++) {
-                    //                        var row_key = new_array[k];
-                    //                        (function (kk, row_key, total) {
-                    //                            redis.hgetall('item_' + row_key, function (err, obj) {
-                    //                                if (err) {
-                    //                                    console.log('line 355');
-                    //                                    console.log(err);
-                    //                                } else {
-                    //                                    if (obj) {
-                    //                                        var original = obj;
-                    //                                        latest_data.push(productObj.getProductPermit(req, original));
-                    //                                    }
-                    //                                }
-                    //                                if (kk === total - 1) {
-                    //                                    latest_cache[page] = latest_data;
-                    //                                    latest_cache_expiry = new Date().getTime();
-                    //                                    done(latest_data);
-                    //                                }
-                    //                            });
-                    //                        })(k, row_key, total);
-                    //
-                    //                    }
                 }
             }
         }
     });
-    /*
-     redis.zrevrangebyscore([latest_type, '+inf', '-inf', 'WITHSCORES', 'LIMIT', page * 20, 20], function (err, response) {
-     if (err) {
-     console.log('307');
-     console.log(err);
-     next(err);
-     } else {
-     if (response.length == 0) {
-     console.log('----empty data should not be here');
-     done([]);//returs empty data not found;
-     } else {
-     console.log('call hua hai');
-     var new_array = [];
-     var total = 0;
-     for (var i = 0; i < response.length; i++) {
-     if (i % 2 === 0) {
-     new_array.push(response[i]);
-     total++;
-     }
-     }
-     
-     if (only_ids) {
-     latest_ids_cache[page] = new_array;
-     latest_cache_expiry = new Date().getTime();
-     done(new_array);
-     } else {
-     
-     for (var k = 0; k < total; k++) {
-     var row_key = new_array[k];
-     (function (kk, row_key, total) {
-     redis.hgetall('item_' + row_key, function (err, obj) {
-     if (err) {
-     console.log('line 355');
-     console.log(err);
-     } else {
-     if (obj) {
-     var original = obj;
-     latest_data.push(productObj.getProductPermit(req, original));
-     }
-     }
-     if (kk === total - 1) {
-     latest_cache[page] = latest_data;
-     latest_cache_expiry = new Date().getTime();
-     done(latest_data);
-     }
-     });
-     })(k, row_key, total);
-     
-     }
-     }
-     }
-     }
-     }); 
-     */
-    //        }
-    //    });
 }
 
 
