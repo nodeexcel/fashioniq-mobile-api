@@ -59,15 +59,14 @@ router.all('/set_genie_alert', function(req, res, next) {
 
 router.all('/unset_genie_alert', function(req, res, next) {
     var body = req.body;
-    var website = body.website;
     var mongo_id = body.mongo_id;
     var email_id = body.email_id;
     var website_scrap_data = req.conn_website_scrap_data;
     var where = {
         _id: mongoose.Types.ObjectId(mongo_id)
     };
-    if (email_id && website) {
-        website_scrap_data.update(where, { $pull: { 'genie_alerts': { email_id: email_id, website: website } } }, function(err, response) {
+    if (email_id) {
+        website_scrap_data.update(where, { $pull: { 'genie_alerts': { email_id: email_id } } }, function(err, response) {
             if (err) {
                 res.json({ error: 1, message: err });
             } else if (response == 1) {
