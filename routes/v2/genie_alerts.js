@@ -57,15 +57,16 @@ router.all('/set_genie_alert', function(req, res, next) {
     }
 });
 
-router.all('/stop_alert', function(req, res, next) {
+router.all('/unset_genie_alert', function(req, res, next) {
     var body = req.body;
+    var website = body.website;
     var mongo_id = body.mongo_id;
     var email_id = body.email_id;
     var website_scrap_data = req.conn_website_scrap_data;
     var where = {
         _id: mongoose.Types.ObjectId(mongo_id)
     };
-    if (mongo_id && email_id) {
+    if (mongo_id && email_id && website) {
         website_scrap_data.find(where, function(err, product) {
             if (err) {
                 res.json({ status: 0, message: err });
@@ -75,7 +76,8 @@ router.all('/stop_alert', function(req, res, next) {
                 product = product[0];
                 var email = product.get('genie_alerts');
                 var check_email = _.some(email, { "email_id": email_id });
-                if (check_email == true) {
+                var check_website = _.some(email, { "website": website });
+                if (check_email == true && check_website == true) {
                     if (product.get('genie_alerts')) {
                         var genie_alerts = email;
                     } else {
@@ -83,7 +85,7 @@ router.all('/stop_alert', function(req, res, next) {
                     }
                     for (var i = 0; i < genie_alerts.length; i++) {
                         var obj = genie_alerts[i];
-                        if (obj.email_id == email_id) {
+                        if (obj.email_id == email_id && obj.website == website) {
                             genie_alerts.splice(i, 1)
                         }
                     }
@@ -109,4 +111,5 @@ router.all('/stop_alert', function(req, res, next) {
         });
     }
 });
+
 module.exports = router;
