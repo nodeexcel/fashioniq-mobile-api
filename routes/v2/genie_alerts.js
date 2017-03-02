@@ -64,7 +64,7 @@ router.all('/set_genie_alert', function(req, res, next) {
                                             } else {
                                                 var push_token = resp.get('token');
                                             }
-                                            var payload = { product_id: exist_product._id };
+                                            var payload = { product_id: product._id };
                                             var notify = {
                                                 title: 'Price alert subscribed',
                                                 body: 'Price alert subscribed for ' + Product_name,
