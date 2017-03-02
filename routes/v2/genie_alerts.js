@@ -109,5 +109,4 @@ router.all('/stop_alert', function(req, res, next) {
         });
     }
 });
-
 module.exports = router;
