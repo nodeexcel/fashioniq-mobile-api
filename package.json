@@ -20,6 +20,7 @@
     "image-size": "^0.3.5",
     "jade": "~1.6.0",
     "jsdom": "^3.1.0",
+    "jwt-simple": "^0.5.1",
     "moment-timezone": "~0.2.5",
     "mongoose": "~3.8.23",
     "mongoose-text-search": "0.0.2",
