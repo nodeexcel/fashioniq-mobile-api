@@ -7,7 +7,6 @@ var moment = require('moment');
 var jwt = require('jwt-simple');
 var PUSH_MESSAGE = require('../../modules/push_message');
 var MAIL = require('../../modules/MAIL');
-var GENERIC = require('../../modules/generic');
 
 router.all('/set_genie_alert', function (req, res, next) {
     var body = req.body;
@@ -61,7 +60,7 @@ router.all('/set_genie_alert', function (req, res, next) {
                                 }
                                 var product_img = product.get('img');
                                 var exist_product_price = product.get('price');
-                                var product_url_aff = GENERIC.getAffiliateUrl(website, product.get('href'));
+                                var product_url_aff = req.productObj.getAffiliateUrl(website, product.get('href'));
                                 var html = '<html><head><style>td ,th{border-style: solid;border-color: grey;}</style></head><body><b>Hello</b><br><br>Greeting from Pricegenie. <br><br>Price alert starts for.<br><br><a href=' + product_url_aff + '><table style="width:100%"><tr align="center"><td colspan="4"><font size="5">' + Product_name + '</font></td></tr><tr align="center"><th rowspan="2"><img src=' + product_img + ' alt="Smiley face" height="80" width="80"></th><th>Current price</th><th rowspan="2"><button type="button" style="height:50px;width:auto">Buy now!</button></th></tr><tr align="center"><td>' + exist_product_price + '</td></tr></tr></table></a><br><br><a href="' + token_link + '">View all your Price Alerts</a></body></html>';
                                 var email = email_id;
                                 var subject = 'Price alert set ' + Product_name;
