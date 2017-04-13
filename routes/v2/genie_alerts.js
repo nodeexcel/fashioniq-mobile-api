@@ -50,7 +50,7 @@ router.all('/set_genie_alert', function (req, res, next) {
                             res.json({error: 1, message: err});
                         } else {
                             var current_date = moment().unix();
-                            var payload = {email: email, time: current_date};
+                            var payload = {email: email_id, time: current_date};
                             var secret = 'Pricegenie';
                             token_encode(payload, secret, function (token) {
                                 var token_link = 'http://pricegenie.co/my_genie_alerts.php?email=' + token;
