@@ -5,11 +5,11 @@ var mongoose = require('mongoose');
 var _ = require('lodash');
 var moment = require('moment');
 var jwt = require('jwt-simple');
-var PUSH_MESSAGE = require('../../modules/push_message');
 var MAIL = require('../../modules/MAIL');
 var GENERIC = require('../../modules/generic');
+var PUSH_MESSAGE = require('../../modules/push_message');
 
-router.all('/set_genie_alert', function (req, res, next) {
+router.all('/set_genie_alert', function(req, res, next) {
     var body = req.body;
     var website = body.website;
     var mongo_id = body.mongo_id;
@@ -22,16 +22,16 @@ router.all('/set_genie_alert', function (req, res, next) {
         _id: mongoose.Types.ObjectId(mongo_id)
     };
     if (mongo_id && email_id && website) {
-        website_scrap_data.find(where, function (err, product) {
+        website_scrap_data.find(where, function(err, product) {
             if (err) {
-                res.json({status: 0, message: err});
+                res.json({ status: 0, message: err });
             } else if (!product) {
-                res.json({status: 0, message: "product not found"});
+                res.json({ status: 0, message: "product not found" });
             } else {
                 product = product[0];
                 var email = product.get('genie_alerts');
                 var Product_name = product.get('name');
-                var check_email = _.some(email, {"email_id": email_id});
+                var check_email = _.some(email, { "email_id": email_id });
                 if (check_email == false) {
                     if (product.get('genie_alerts')) {
                         var genie_alerts = email;
@@ -46,11 +46,11 @@ router.all('/set_genie_alert', function (req, res, next) {
                     to_be_update_data = {
                         genie_alerts: genie_alerts,
                     };
-                    website_scrap_data.update(where, {'$set': to_be_update_data}, function (err, response) {
+                    website_scrap_data.update(where, { '$set': to_be_update_data }, function(err, response) {
                         if (err) {
-                            res.json({error: 1, message: err});
+                            res.json({ error: 1, message: err });
                         } else {
-                            var current_date = moment().unix();
+                             var current_date = moment().unix();
                             var payload = {email: email, time: current_date};
                             var secret = 'Pricegenie';
                             token_encode(payload, secret, function (token) {
@@ -92,13 +92,13 @@ router.all('/set_genie_alert', function (req, res, next) {
                                     }
                                 });
                             });
-                            UserModel.findOne({email: email_id}, function (err, user) {
+                            UserModel.findOne({ email: email_id }, function(err, user) {
                                 if (err) {
                                     console.log(err);
                                 } else if (!user) {
                                     console.log('not found');
                                 } else {
-                                    req.GCM.findOne({user_id: user._id.toString()}, function (error, resp) {
+                                    req.GCM.findOne({ user_id: user._id.toString() }, function(error, resp) {
                                         if (error) {
                                             console.log(err)
                                         } else if (!resp) {
@@ -111,14 +111,14 @@ router.all('/set_genie_alert', function (req, res, next) {
                                             } else {
                                                 var push_token = resp.get('token');
                                             }
-                                            var payload = {product_id: product._id};
+                                            var payload = {};
                                             var notify = {
                                                 title: 'Price alert subscribed',
                                                 body: 'Price alert subscribed for ' + Product_name,
                                                 click_action: "FCM_PLUGIN_ACTIVITY",
                                                 "color": "#f95b2c"
                                             };
-                                            PUSH_MESSAGE.push_notification(push_token, payload, notify, function (error, response) {
+                                            PUSH_MESSAGE.push_notification(push_token, payload, notify, function(error, response) {
                                                 if (error == 'error') {
                                                     console.log(response);
                                                 } else {
@@ -138,7 +138,7 @@ router.all('/set_genie_alert', function (req, res, next) {
                                                         genie_alerts: 'subscribed'
                                                     };
                                                     var insert_push_info = new log_push_notification(push_info);
-                                                    insert_push_info.save(function (err, resp) {
+                                                    insert_push_info.save(function(err, resp) {
                                                         if (err) {
                                                             console.log(err)
                                                         } else {
@@ -151,11 +151,11 @@ router.all('/set_genie_alert', function (req, res, next) {
                                     })
                                 }
                             })
-                            res.json({status: 0, message: "Price alert subscribed"});
+                            res.json({ status: 0, message: "Price alert subscribed" });
                         }
                     });
                 } else {
-                    res.json({status: 0, message: "you are already subscribed"});
+                    res.json({ status: 0, message: "you are already subscribed" });
                 }
             }
         });
@@ -167,7 +167,7 @@ router.all('/set_genie_alert', function (req, res, next) {
     }
 });
 
-router.all('/unset_genie_alert', function (req, res, next) {
+router.all('/unset_genie_alert', function(req, res, next) {
     var body = req.body;
     var mongo_id = body.mongo_id;
     var email_id = body.email_id;
@@ -178,11 +178,11 @@ router.all('/unset_genie_alert', function (req, res, next) {
         _id: mongoose.Types.ObjectId(mongo_id)
     };
     if (email_id) {
-        website_scrap_data.update(where, {$pull: {'genie_alerts': {email_id: email_id}}}, function (err, response) {
+        website_scrap_data.update(where, { $pull: { 'genie_alerts': { email_id: email_id } } }, function(err, response) {
             if (err) {
-                res.json({error: 1, message: err});
+                res.json({ error: 1, message: err });
             } else if (response == 1) {
-                website_scrap_data.find(where, function (err, result) {
+                website_scrap_data.find(where, function(err, result) {
                     if (err) {
                         console.log(err);
                     } else if (result.length == 0) {
@@ -190,13 +190,13 @@ router.all('/unset_genie_alert', function (req, res, next) {
                     } else {
                         exist_product = result[0];
                         var Product_name = exist_product.get('name');
-                        UserModel.findOne({email: email_id}, function (err, user) {
+                        UserModel.findOne({ email: email_id }, function(err, user) {
                             if (err) {
                                 console.log(err);
                             } else if (!user) {
                                 console.log('not found');
                             } else {
-                                req.GCM.findOne({user_id: user._id.toString()}, function (error, resp) {
+                                req.GCM.findOne({ user_id: user._id.toString() }, function(error, resp) {
                                     if (error) {
                                         console.log(err)
                                     } else if (!resp) {
@@ -209,14 +209,14 @@ router.all('/unset_genie_alert', function (req, res, next) {
                                         } else {
                                             var push_token = resp.get('token');
                                         }
-                                        var payload = {product_id: exist_product._id};
+                                        var payload = {};
                                         var notify = {
                                             title: 'Price alert unsubscribed',
                                             body: 'Price alert unsubscribed for ' + Product_name,
                                             click_action: "FCM_PLUGIN_ACTIVITY",
                                             "color": "#f95b2c"
                                         };
-                                        PUSH_MESSAGE.push_notification(push_token, payload, notify, function (error, response) {
+                                        PUSH_MESSAGE.push_notification(push_token, payload, notify, function(error, response) {
                                             if (error == 'error') {
                                                 console.log(response);
                                             } else {
@@ -236,7 +236,7 @@ router.all('/unset_genie_alert', function (req, res, next) {
                                                     genie_alerts: 'unsubscribed'
                                                 };
                                                 var insert_push_info = new log_push_notification(push_info);
-                                                insert_push_info.save(function (err, resp) {
+                                                insert_push_info.save(function(err, resp) {
                                                     if (err) {
                                                         console.log(err)
                                                     } else {
@@ -251,15 +251,17 @@ router.all('/unset_genie_alert', function (req, res, next) {
                         })
                     }
                 });
-                res.json({status: 0, message: "Price alert unsubscribed"});
+                res.json({ status: 0, message: "Price alert unsubscribed" });
             } else {
-                res.json({status: 0, message: "product not found"});
+                res.json({ status: 0, message: "product not found" });
             }
         });
     } else {
-        res.json({error: 0, message: 'Invalid Request'});
+        res.json({ error: 0, message: 'Invalid Request' });
     }
 });
+
+module.exports = router;
 
 function token_encode(payload, secret, callback) {
     if (payload && secret) {
