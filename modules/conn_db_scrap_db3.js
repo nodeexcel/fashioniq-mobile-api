@@ -47,13 +47,6 @@ module.exports = function(mongoose) {
         strict: false,
         collection: 'log_push_notification'
     });
-    var schema_price_alerts_email_log = mongoose.Schema({}, {
-        strict: false,
-        collection: 'price_alerts_email_log'
-    });
-    var conn_price_alerts_email_log = conn.model('price_alerts_email_log', schema_price_alerts_email_log);
-
-
     var log_push_notification = conn.model('log_push_notification', schema_log_push_notification);
     var temp_latest = conn.model('temp_latest', schema_temp_latest);
     var final_fashion_filters = conn.model('final_fashion_filters', schema_final_fashion_filters);
@@ -281,7 +274,6 @@ module.exports = function(mongoose) {
         req.user_watch_map = user_watch_map;
         req.redis = client;
         req.log_push_notification = log_push_notification;
-        req.conn_price_alerts_email_log = conn_price_alerts_email_log;
         next();
     }
 }
