@@ -270,5 +270,4 @@ function token_encode(payload, secret, callback) {
         callback('');
     }
 };
-
 module.exports = router;
