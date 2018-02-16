@@ -35,10 +35,6 @@ module.exports = function(mongoose) {
         strict: false,
         collection: 'category'
     });
-    var schema_category = mongoose.Schema({}, {
-        strict: false,
-        collection: 'category'
-    });
     var schema_temp_latest = mongoose.Schema({}, {
         strict: false,
         collection: 'temp_latest'
