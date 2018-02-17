@@ -89,56 +89,10 @@ module.exports = function () {
 
             return p;
         },
-        getAffiliateUrl: function (website, url) {
-            var aff_url = '';
-            if (website == 'Flipkart') {
-                if (url.indexOf('manishexce') != -1) {
-                    url = url;
-                } else {
-                    if (url.indexOf('?') == -1) {
-                        url += '?affid=manishexce';
-                    } else {
-                        url += '&affid=manishexce';
-                    }
-                }
-                if (url.indexOf('flipkart.com/dl/') != -1 || url.indexOf('dl.flipkart.com') != -1) {
-                } else {
-                    url = url.replace('www.', '');
-                    url = url.replace('flipkart.com/', 'dl.flipkart.com/dl/');
-                }
-                aff_url = url;
-            } else if (website == 'Snapdeal') {
-                if (url.indexOf('aff_id=1210') != -1) {
-                    url = url;
-                }
-                {
-                    if (url.indexOf('?') == -1) {
-                        url += '?offer_id=17';
-                    } else {
-                        url += '&offer_id=17';
-                    }
-                    url += '&aff_id=1210';
-                    url += '&utm_source=aff_prog';
-                    url += '&utm_campaign=afts';
-                }
-                aff_url = url;
-            }else  if (website == 'amazon') {
-                if (url.indexOf('pricegenie-21') != -1) {
-                    url = url;
-                } else {
-                    if (url.indexOf('?') == -1) {
-                        url += '?linkCode=as2';
-                    } else {
-                        url += '&linkCode=as2';
-                    }
-                    url += '&tag=pricegenie-21';
-                }
-                aff_url = url;
-            }  else {
-                aff_url = 'http://linksredirect.com?pub_id=2491CL2376&url=' + encodeURIComponent(url);
-            }
-            return aff_url;
-        }
+       getAffiliateUrl: function (website, url) {
+        aff_url = 'http://linksredirect.com?pub_id=2491CL2376&url=' + encodeURIComponent(url);
+        return aff_url;
+    }
     };
     return function (req, res, next) {
         req.productObj = productObj;
