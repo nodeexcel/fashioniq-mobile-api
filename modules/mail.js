@@ -16,7 +16,7 @@ module.exports = function () {
         send: function (to, subject, template, context) {
             //---added by arun on 1st may 2015
             var mandrill = require('mandrill-api/mandrill');
-            var mandrill_client = new mandrill.Mandrill('Ca4nS3QStEcpvZdk9iMh0Q'); 
+            // var mandrill_client = new mandrill.Mandrill(''); 
             // var message = {
             //     "html": context.body,
             //     "subject": subject,
@@ -37,8 +37,8 @@ module.exports = function () {
                 host: 'smtp.sendgrid.net',
                 port: 25,
                 auth: {
-                    user: 'apikey',
-                    pass: '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'
+                    user: process.env.SENDGRID_API_USER,
+                    pass: process.env.SENDGRID_API_KEY
                 }
 
             }));

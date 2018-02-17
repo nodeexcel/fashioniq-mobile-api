@@ -2,10 +2,13 @@ Moving to github rahulexcel account.
 dont use this anymore
 we cannot shift to git because we hare user/pass for email sending in code.
 
-###details for sending emails.
+### create a .env file where environment variables can be add
+##### add send grid key in .env file
+SENDGRID_API_USER=user
+SENDGRID_API_KEY=key
 
-pass: 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
-user: apikey  
+###details for sending emails.
+api user and key need to be added in .env file
 host: smtp.sendgrid.net
 port: 465 or 25
 

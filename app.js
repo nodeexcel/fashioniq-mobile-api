@@ -8,6 +8,11 @@ var mongoose = require('mongoose');
 var multer = require('multer')
 var useragent = require('express-useragent');
 
+// this is added so that to secure and use env variables
+// now no need to add secure keys in code
+var dotenv = require('dotenv');
+dotenv.load();
+
 var module_config = require('./modules/config');
 var module_conn_pricegenie = require('./modules/conn_pricegenie');
 var module_conn_db_scrap_db3 = require('./modules/conn_db_scrap_db3');
@@ -37,7 +42,6 @@ var v2_routes_feedback = require('./routes/v2/feedback');
 var v2_routes_parseurl = require('./routes/v2/parseurl');
 var v2_routes_notify = require('./routes/v2/notify');
 var v2_routes_genie_alerts = require('./routes/v2/genie_alerts');
-
 
 var app = express();
 app.use(useragent.express());
