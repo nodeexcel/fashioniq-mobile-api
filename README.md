@@ -1,7 +1,7 @@
 # Fashioniq APP Api's
 
 
-###details for sending emails.
+### details for sending emails.
 ```
 api user and key need to be added in .env file
 host: smtp.sendgrid.net
