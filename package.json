@@ -23,7 +23,7 @@
     "jwt-simple": "^0.5.1",
     "mandrill-api": "^1.0.45",
     "moment-timezone": "~0.2.5",
-    "mongoose": "~3.8.23",
+    "mongoose": "^4.13.11",
     "mongoose-text-search": "0.0.2",
     "moniker": "^0.1.2",
     "morgan": "~1.3.0",
